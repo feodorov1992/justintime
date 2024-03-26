@@ -1,0 +1,9 @@
+Django
+psycopg2
+uWSGI
+Pillow
+xlwt
+celery
+redis
+django-filter
+django-admin-autocomplete-all
