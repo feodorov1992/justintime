@@ -1,7 +1,7 @@
 # from django.contrib import admin
 import autocomplete_all as admin
 
-from cats.models import Organisation
+from cats.models import Organisation, Currency, Contract, Service, Country, City, Package, CargoParam
 
 
 @admin.register(Organisation)
@@ -27,3 +27,38 @@ class OrgAdmin(admin.ModelAdmin):
                 return queryset.filter(is_expeditor=False)
 
         return queryset
+
+
+@admin.register(Currency)
+class CurrencyAdmin(admin.ModelAdmin):
+    search_fields = 'code', 'name'
+
+
+@admin.register(Contract)
+class ContractAdmin(admin.ModelAdmin):
+    search_fields = 'number',
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Country)
+class CountryAdmin(admin.ModelAdmin):
+    search_fields = 'name',
+
+
+@admin.register(City)
+class CityAdmin(admin.ModelAdmin):
+    search_fields = 'name',
+
+
+@admin.register(Package)
+class PackageAdmin(admin.ModelAdmin):
+    search_fields = 'name',
+
+
+@admin.register(CargoParam)
+class CargoParamAdmin(admin.ModelAdmin):
+    pass
