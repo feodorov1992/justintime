@@ -38,3 +38,4 @@ class Organisation(AbstractModel):
     class Meta:
         verbose_name = 'организация'
         verbose_name_plural = 'организации'
+        ordering = ['name']

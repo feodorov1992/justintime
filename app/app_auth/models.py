@@ -1,6 +1,10 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import Group as DjangoGroup
 from django.db import models
+from django.db.models.signals import pre_save, post_save
+from django.dispatch import receiver
 
 from app.models import AbstractModel
 from cats.models import Organisation
@@ -30,6 +34,12 @@ class User(AbstractModel, AbstractUser):
     def save(self, *args, **kwargs):
         if self.organization_id is None and (self.is_staff or self.is_superuser):
             self.organization = Organisation.objects.get(is_expeditor=True)
+        if self.organization.is_expeditor:
+            self.is_staff = True
+        else:
+            self.is_staff = False
+        if self.is_staff:
+            self.main_manager = None
         if self.username and not self.email:
             self.email = self.username
         super(User, self).save(*args, **kwargs)
@@ -37,6 +47,12 @@ class User(AbstractModel, AbstractUser):
     class Meta:
         verbose_name = 'пользователь'
         verbose_name_plural = 'пользователи'
+
+
+@receiver(post_save, sender=User)
+def save_order(sender, instance: User, created, **kwargs):
+    if created:
+        print(instance)
 
 
 class Group(DjangoGroup):

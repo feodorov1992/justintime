@@ -1,8 +1,12 @@
 # from django.contrib import admin
+import uuid
+
 import autocomplete_all as admin
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
 from django.db.models import Q
+from django.forms import ModelForm
 
 from app_auth.models import Group, User, DjangoGroup
 
@@ -12,11 +16,28 @@ class GroupAdmin(BaseGroupAdmin):
     pass
 
 
+class UserCreationForm(ModelForm):
+
+    class Meta:
+        model = User
+        fields = ('username', 'last_name', 'first_name', 'second_name', 'organization', 'main_manager')
+
+
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, admin.ModelAdmin):
     list_display = '__str__', 'organization', 'email', 'is_staff'
     list_filter = 'is_staff', 'is_superuser', 'is_active', 'groups'
     search_fields = 'username', 'first_name', 'last_name', 'email'
+    add_form = UserCreationForm
+    add_fieldsets = (
+        (
+            None,
+            {
+                'classes': ('wide',),
+                'fields': ('username', 'last_name', 'first_name', 'second_name', 'organization', 'main_manager'),
+            },
+        ),
+    )
     ordering = 'last_name',
     readonly_fields = 'email',
     autocomplete_fields = 'organization', 'main_manager'

@@ -12,6 +12,9 @@ class OrgAdmin(admin.ModelAdmin):
 
     def get_search_results_ajax(self, queryset, referer, key, urlparams):
 
+        if referer == 'app_auth/user/add/':
+            return queryset.exclude(is_expeditor=False, is_client=False)
+
         if referer.startswith('app_auth/user/'):
             is_staff = urlparams.get('is_staff', ['false'])
             is_staff = True if is_staff == ['true'] else False
