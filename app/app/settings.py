@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'cats',
     'orgs',
     'geo',
-    'app_auth'
+    'app_auth',
+    'logistics'
 ]
 
 MIDDLEWARE = [

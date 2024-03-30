@@ -10,7 +10,7 @@ class CurrencyAdmin(admin.ModelAdmin):
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
-    pass
+    search_fields = 'name',
 
 
 @admin.register(Package)
@@ -20,4 +20,4 @@ class PackageAdmin(admin.ModelAdmin):
 
 @admin.register(CargoParam)
 class CargoParamAdmin(admin.ModelAdmin):
-    pass
+    search_fields = 'name',
