@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <table{% if global_table_style %} style="{{ global_table_style }}"{% endif %}>
+        <tr>
+            <td{% if global_table_style %} style="{{ global_table_style }}"{% endif %}>
+                <table{% if main_table_style %} style="{{ main_table_style }}"{% endif %}>
+                    {% for item in data %}
+                        {{ item }}
+                    {% endfor %}
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
