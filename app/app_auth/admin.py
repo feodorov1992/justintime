@@ -1,11 +1,6 @@
-# from django.contrib import admin
-import uuid
-
 import autocomplete_all as admin
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from django.contrib.auth.forms import UserCreationForm as BaseUserCreationForm
-from django.db.models import Q
 from django.forms import ModelForm
 
 from app_auth.models import Group, User, DjangoGroup
@@ -59,16 +54,30 @@ class UserAdmin(BaseUserAdmin, admin.ModelAdmin):
         ('Важные даты', {'fields': ('last_login', 'date_joined')}),
     )
 
+    @staticmethod
+    def get_ajax_value(source, key, default=None):
+        value = source.get(key, default)
+        if value and isinstance(value, list):
+            return value[0]
+        return value
+
+    def get_ajax_bool(self, source, key):
+        positives = 'true', 'on', 'yes', 'y', '1'
+        value = self.get_ajax_value(source, key, False)
+        return str(value).lower() in positives
+
     def get_search_results_ajax(self, queryset, referer, key, urlparams):
         if referer.startswith('app_auth/user/'):
-            is_staff = urlparams.get('is_staff', ['false'])
-            is_staff = True if is_staff == ['true'] else False
-            is_superuser = urlparams.get('is_superuser', ['false'])
-            is_superuser = True if is_superuser == ['true'] else False
             if key == 'id_main_manager':
+                is_staff = self.get_ajax_bool(urlparams, 'is_staff')
+                is_superuser = self.get_ajax_bool(urlparams, 'is_superuser')
                 if is_staff or is_superuser:
                     return queryset.none()
-                return queryset.filter(organization__is_expeditor=True)
+                username = self.get_ajax_value(urlparams, 'username')
+                queryset = queryset.filter(organization__is_expeditor=True)
+                sub_qs = queryset.filter(username=username)
+                if sub_qs.exists():
+                    return queryset.exclude(id=sub_qs.first().id)
         return queryset
 
 

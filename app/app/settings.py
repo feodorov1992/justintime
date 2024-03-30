@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'autocomplete_all',
     'cats',
+    'orgs',
+    'geo',
     'app_auth'
 ]
 

@@ -10,3 +10,13 @@ class AbstractModel(models.Model):
 
     class Meta:
         abstract = True
+
+
+class AbstractCatalogueModel(models.Model):
+    name = models.CharField(max_length=100, verbose_name='Наименование', db_index=True, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        abstract = True
