@@ -1,3 +1,4 @@
+import os
 from typing import Union
 
 from django.conf import settings
@@ -104,15 +105,13 @@ class Order(AbstractModel):
     to_date_plan = models.DateField(blank=True, null=True, verbose_name='Дата доставки (план)')
     to_date_fact = models.DateField(blank=True, null=True, verbose_name='Дата доставки (факт)')
 
-    status = models.CharField(max_length=25, verbose_name='Статус',
-                              choices=ORDER_STATUS_LABELS, default=ORDER_STATUS_LABELS[0][0])
     tracking_url = models.URLField(verbose_name='Ссылка на отслеживание', blank=True, null=True)
     services = models.ManyToManyField(Service, verbose_name='Доп. услуги', blank=True)
     comment = models.TextField(verbose_name='Примечание', blank=True, null=True)
     service_marks = models.TextField(verbose_name='Служебные отметки', blank=True, null=True)
-    sum_weight = models.FloatField(verbose_name='Суммарный вес брутто, кг', blank=True, null=True)
-    sum_volume = models.FloatField(verbose_name='Суммарный объем груза, м3', blank=True, null=True)
-    sum_quantity = models.IntegerField(verbose_name='Суммарное кол-во мест', blank=True, null=True)
+    sum_weight = models.FloatField(verbose_name='Вес брутто груза, кг', blank=True, null=True)
+    sum_volume = models.FloatField(verbose_name='Объем груза, м3', blank=True, null=True)
+    sum_quantity = models.IntegerField(verbose_name='Кол-во мест', blank=True, null=True)
 
     def sum_cargo_params(self, queryset: QuerySet = None, commit: bool = False):
         if queryset is None:
@@ -127,13 +126,94 @@ class Order(AbstractModel):
             sum_quantity=models.Sum('quantity')
         )
 
-        self.sum_weight = round(aggregate['sum_weight'], 2)
-        self.sum_volume = round(aggregate['sum_volume'] / 1000000, 3)
-        self.sum_quantity = aggregate['sum_quantity']
+        self.sum_weight = round(aggregate['sum_weight'] or 0, 2)
+        self.sum_volume = round(aggregate['sum_volume'] or 0 / 1000000, 3)
+        self.sum_quantity = aggregate['sum_quantity'] or 0
         if commit:
             self.save()
 
         return aggregate
+
+    def status(self):
+        return self.orderstatus_set.first()
+
+    status.short_description = 'Статус'
+
+    def get_field_choices(self, field_name):
+        fields = {field.name: field for field in self._meta.fields}
+        field = fields.get(field_name)
+        if field:
+            return field.choices
+
+    def _get_field(self, field_name: str, field_prefix: str = None):
+        is_callable = False
+        value = None
+        if field_prefix is None:
+            field_prefix = ''
+        full_name = field_prefix + field_name
+        if hasattr(self, full_name):
+            if self.get_field_choices(full_name):
+                full_name = f'get_{full_name}_display'
+                is_callable = True
+            value = getattr(self, full_name)
+            if value and is_callable:
+                value = value()
+        if value is None:
+            return ''
+        return str(value)
+
+    def _short_address(self, field_prefix: str = None):
+        addr_label = self._get_field('label', field_prefix)
+        if addr_label:
+            return addr_label
+        result = list()
+        country = self._get_field('country', field_prefix)
+        if country:
+            result.append(country)
+        city = self._get_field('city', field_prefix)
+        if city:
+            result.append(city)
+        return ', '.join(result)
+
+    def _full_address(self, field_prefix: str = None):
+        result = list()
+        index = self._get_field('index', field_prefix)
+        country = self._get_field('country', field_prefix)
+        city = self._get_field('city', field_prefix)
+        address = self._get_field('address', field_prefix)
+        address = ' '.join([i.lower() for i in address.split()])
+        if index and index.lower() not in address:
+            result.append(index)
+        if country and country.lower() not in address:
+            result.append(country)
+        if city and city.lower() not in address:
+            result.append(city)
+        address = [i for i in address.split(', ')]
+        reworked_address = list()
+        for item in address:
+            reworked_item = ' '.join([i.capitalize() for i in item.split()])
+            reworked_address.append(reworked_item)
+        return ', '.join(result + reworked_address)
+
+    def from_address_short(self):
+        return self._short_address('from_')
+
+    from_address_short.short_description = 'Пункт отправки'
+
+    def to_address_short(self):
+        return self._short_address('to_')
+
+    to_address_short.short_description = 'Пункт доставки'
+
+    def from_address_full(self):
+        return self._full_address('from_')
+
+    from_address_full.short_description = 'Адрес отправки'
+
+    def to_address_full(self):
+        return self._full_address('to_')
+
+    to_address_full.short_description = 'Адрес доставки'
 
     def save(
             self, force_insert=False, force_update=False, using=None, update_fields=None
@@ -157,12 +237,60 @@ class Cargo(AbstractModel):
     length = models.FloatField(verbose_name='Длина, см')
     width = models.FloatField(verbose_name='Ширина, см')
     height = models.FloatField(verbose_name='Высота, см')
-    weight = models.FloatField(verbose_name='Вес одного места, кг')
-    quantity = models.IntegerField(verbose_name='Количество мест')
+    weight = models.FloatField(verbose_name='Вес, кг')
+    quantity = models.IntegerField(verbose_name='Кол-во мест')
     params = models.ManyToManyField(CargoParam, verbose_name='Доп. параметры груза', blank=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='cargos', verbose_name='Заявка')
+
+    def __str__(self):
+        return f'{self.package} {self.length}х{self.width}х{self.height} см, {self.weight} кг ({self.quantity} шт)'
 
     class Meta:
         verbose_name = 'груз'
         verbose_name_plural = 'грузы'
         ordering = 'created_at',
+
+
+class OrderStatus(AbstractModel):
+    name = models.CharField(max_length=25, verbose_name='Статус',
+                            choices=ORDER_STATUS_LABELS, default=ORDER_STATUS_LABELS[0][0])
+    change_time = models.DateTimeField(default=timezone.now, verbose_name='Время изменения статуса', db_index=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заявка')
+
+    def __str__(self):
+        return f'{self.change_time.strftime("%d.%m.%Y %H:%M:%S")}: {self.get_name_display()}'
+
+    class Meta:
+        verbose_name = 'статус заявки'
+        verbose_name_plural = 'статусы заявки'
+        ordering = 'order', '-change_time',
+
+
+def path_by_order(instance, filename, month=None, year=None):
+    if not month:
+        month = instance.order.order_date.month
+    if not year:
+        year = instance.order.order_date.year
+    return os.path.join(
+        'files',
+        'orders',
+        str(year),
+        '{:0>2}'.format(month),
+        instance.order.id.hex,
+        filename
+    )
+
+
+class AttachedDocument(AbstractModel):
+    title = models.CharField(max_length=255, verbose_name='Наименование документа')
+    file = models.FileField(verbose_name='Файл', upload_to=path_by_order)
+    is_public = models.BooleanField(default=False, db_index=True, verbose_name='Показать клиенту')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заявка')
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = 'Приложенный файл'
+        verbose_name_plural = 'Приложенные файлы'
+        ordering = '-created_at',

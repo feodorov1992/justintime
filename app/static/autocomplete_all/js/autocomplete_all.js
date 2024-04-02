@@ -35,13 +35,53 @@ target ModelAdmin:
 //     django.jQuery = $;
 // }
 
+function erasePrefix(s, _prefix) {
+    if (!_prefix) {
+        return s
+    }
+    return s.substring(_prefix.length + 1)
+}
+
+function getPrefix(fieldId, toName=true) {
+    if (toName) {
+        return fieldId.substring(3).split('-').slice(0, -1).join('-')
+    }
+    return fieldId.split('-').slice(0, -1).join('-')
+}
+
+function sanitize(string) {  // https://stackoverflow.com/questions/2794137/sanitizing-user-input-before-adding-it-to-the-dom-in-javascript
+    if (string === null) {return '';}
+
+    // https://stackoverflow.com/questions/4310535/how-to-convert-anything-to-a-string-safely-in-javascript
+    switch (typeof string) {
+        case 'object':
+            return 'object';
+        case 'function':
+            return 'function';
+        default:
+            return string + '';  // to string (dj 3.2 was reported an issue with non-string content here, which fails on string.replace)
+    }
+
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#x27;',
+        "/": '&#x2F;',
+    };
+    const reg = /[&<>"'/]/ig;
+    return string.replace(reg, (match)=>(map[match]));
+}
+
 document.addEventListener("DOMContentLoaded", function () {
     (function ($) {
         $('select.admin-autocomplete').on('select2:opening', function (evt) {
             if (!window.history.orig_pathname) {
                 window.history.orig_pathname = window.location.pathname;
             }
-            this.modified_location_search_key = '?key=' + this.id;
+            let prefix = getPrefix(this.id, false)
+            this.modified_location_search_key = '?key=' + erasePrefix(this.id, prefix);
             this.modified_location_search = this.modified_location_search_key + expand_ajax_params($, this.id);
             window.history.replaceState(null, null, window.history.orig_pathname + this.modified_location_search);
         });
@@ -73,49 +113,55 @@ function expand_ajax_params($, key) {
 
 // the default function adds nothing to params (except of ?key=..)
 //  but you can rewrite this function in particular js file (entered as 2nd one in Source admin, class Media, js=(.., ..))
+const prohibitedNames = [
+    'csrfmiddlewaretoken',
+]
+
 function expand_ajax_params($, fieldId) {
-    function sanitize(string) {  // https://stackoverflow.com/questions/2794137/sanitizing-user-input-before-adding-it-to-the-dom-in-javascript
-        if (string === null) {return '';}
 
-        // https://stackoverflow.com/questions/4310535/how-to-convert-anything-to-a-string-safely-in-javascript
-        switch (typeof string) {
-            case 'object':
-                return 'object';
-            case 'function':
-                return 'function';
-            default:
-                return string + '';  // to string (dj 3.2 was reported an issue with non-string content here, which fails on string.replace)
-        }
+    function make_addition(name, value, firstChar = '&') {
+       return firstChar + erasePrefix(name, prefix) + '=' + sanitize(value)
+    }
 
-        const map = {
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#x27;',
-            "/": '&#x2F;',
-        };
-        const reg = /[&<>"'/]/ig;
-        return string.replace(reg, (match)=>(map[match]));
+    function getFilteredJQuery(query, prefix) {
+        return $(query).filter(function(){
+            let elem = $(this)
+            let name = elem.attr('name')
+
+            if (!name) {
+                return false
+            }
+
+            let notInExclude = prohibitedNames.indexOf(name) === -1
+            let notIsButton = !name.startsWith('_')
+            let checkPrefix
+            if (!prefix) {
+                checkPrefix = !name.includes('-')
+            } else {
+                checkPrefix = name.startsWith(prefix)
+            }
+            return notInExclude && checkPrefix && notIsButton
+        })
     }
 
     let expanded = '';
+    const prefix = getPrefix(fieldId);
+    let controls = getFilteredJQuery('input, select', prefix)
 
-    let controls = $('input, select');
     controls.each(function () {
         let obj = $(this);
         if (obj.prop('type') === 'checkbox') {
-            expanded += '&' + obj.prop('name') + '=' + sanitize(obj.prop('checked'));
+            expanded += make_addition(obj.prop('name'), obj.prop('checked'))
         } else {
-            expanded += '&' + obj.prop('name') + '=' + sanitize(obj.val());
+            expanded += make_addition(obj.prop('name'), obj.val())
         }
     })
 
-    let textareas = $('textarea');
+    let textareas = getFilteredJQuery('textarea', prefix)
     textareas.each(function () {
         let obj = $(this);
         let content = obj.val();
-        expanded += '&' + obj.prop('name') + '=' + content.length;
+        expanded += make_addition(obj.prop('name'), content.length.toString())
         if (content.length <= 40) {
             expanded += ':' + sanitize(content);
         }

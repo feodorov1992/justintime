@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'autocomplete_all',
+    'rangefilter',
+    'admin_auto_filters',
     'cats',
     'orgs',
     'geo',
