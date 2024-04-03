@@ -1,40 +1,84 @@
 import autocomplete_all as admin
+from admin_auto_filters.filters import AutocompleteFilter
+from autocomplete_all import TabularInline
+from django.db.models import Q
 
+from app.mixins import AdminAjaxMixin
+from app_auth.models import User
 from orgs.models import Organisation, Contract
 
 
-@admin.register(Organisation)
-class OrgAdmin(admin.ModelAdmin):
-    list_display = '__str__', 'is_client', 'is_expeditor'
-    list_filter = 'is_client', 'is_expeditor'
-    search_fields = 'inn', 'kpp', 'ogrn', 'name', 'legal_name'
-    readonly_fields = 'is_expeditor',
+class OrgAdminFilter(AutocompleteFilter):
+    field_name = 'organization'
+    title = 'Организация'
 
-    def get_search_results_ajax(self, queryset, referer, key, urlparams):
+
+class UserInline(TabularInline):
+    model = User
+    extra = 0
+    classes = ['collapse']
+    fields = 'username', 'last_name', 'first_name', 'second_name', 'main_manager'
+    autocomplete_fields = 'main_manager',
+    show_change_link = True
+
+
+class ExpeditorUserInline(UserInline):
+    fields = 'username', 'last_name', 'first_name', 'second_name'
+    autocomplete_fields = None
+
+
+class ContractInline(TabularInline):
+    model = Contract
+    extra = 0
+    classes = ['collapse']
+
+
+@admin.register(Organisation)
+class OrgAdmin(admin.ModelAdmin, AdminAjaxMixin):
+    list_display = '__str__', 'legal_name', 'inn', 'kpp', 'is_client'
+    list_filter = 'is_client', 'is_expeditor'
+    search_fields = 'name', 'legal_name', 'inn', 'kpp', 'ogrn'
+    readonly_fields = 'is_expeditor',
+    inlines = UserInline, ContractInline
+
+    def get_inlines(self, request, obj):
+        if obj is not None:
+            if obj.is_expeditor:
+                return ExpeditorUserInline,
+            elif not obj.is_client:
+                return tuple()
+        return super(OrgAdmin, self).get_inlines(request, obj)
+
+    def get_search_results_ajax(self, queryset, referer: str, key: str, urlparams: dict):
 
         if referer.startswith('app_auth/user/'):
-            if referer == 'app_auth/user/add/':
+            if referer.endswith('add/') or referer == 'app_auth/user/':
                 return queryset.exclude(is_expeditor=False, is_client=False)
-
-            is_staff = urlparams.get('is_staff', ['false'])
-            is_staff = True if is_staff == ['true'] else False
-            is_superuser = urlparams.get('is_superuser', ['false'])
-            is_superuser = True if is_superuser == ['true'] else False
-
-            if key == 'id_organization':
-                if is_staff or is_superuser:
+            elif referer.endswith('change/'):
+                if self.check_multiple_bools(urlparams, 'is_staff', 'is_superuser'):
                     return queryset.filter(is_expeditor=True)
                 return queryset.filter(is_client=True)
+        elif referer.startswith('logistics/order/'):
+            if 'client' in key:
+                return queryset.filter(is_client=True)
+        elif referer.startswith('orgs/contract/'):
+            return queryset.exclude(Q(is_expeditor=True) | Q(is_expeditor=False, is_client=False))
 
         return queryset
 
 
 @admin.register(Contract)
-class ContractAdmin(admin.ModelAdmin):
+class ContractAdmin(admin.ModelAdmin, AdminAjaxMixin):
     search_fields = 'number',
     list_display = '__str__', 'organization', 'is_active'
-    list_filter = 'organization',
+    list_filter = OrgAdminFilter,
 
     def get_queryset(self, request):
         queryset = super(ContractAdmin, self).get_queryset(request)
         return queryset.select_related('organization')
+
+    def get_search_results_ajax(self, queryset, referer: str, key: str, urlparams: dict):
+        if referer.startswith('logistics/order/'):
+            client_id = self.get_ajax_value(urlparams, 'client')
+            return queryset.filter(organization_id=client_id)
+        return queryset

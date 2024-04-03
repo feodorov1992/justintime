@@ -5,6 +5,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import QuerySet
+from django.template.defaultfilters import floatformat
 from django.utils import timezone
 
 from app.models import AbstractModel
@@ -134,10 +135,29 @@ class Order(AbstractModel):
 
         return aggregate
 
+    def clean(self):
+        errors = dict()
+        super(Order, self).clean()
+        if self.contract and self.contract.organization_id != self.client_id:
+            errors['contract'] = 'При изменении заказчика необходимо изменить договор!'
+        if self.client_employee and self.client_employee.organization_id != self.client_id:
+            errors['client_employee'] = 'При изменении заказчика необходимо изменить сотрудника!'
+        if self.from_city and self.from_city.country_id != self.from_country_id:
+            errors['from_city'] = 'При изменении страны необходимо изменить город!'
+        if self.to_city and self.to_city.country_id != self.to_country_id:
+            errors['to_city'] = 'При изменении страны необходимо изменить город!'
+        if errors:
+            raise ValidationError(errors)
+
     def status(self):
         return self.orderstatus_set.first()
 
     status.short_description = 'Статус'
+
+    def status_short(self):
+        return self.orderstatus_set.first().get_name_display()
+
+    status_short.short_description = 'Статус'
 
     def get_field_choices(self, field_name):
         fields = {field.name: field for field in self._meta.fields}
@@ -214,6 +234,12 @@ class Order(AbstractModel):
         return self._full_address('to_')
 
     to_address_full.short_description = 'Адрес доставки'
+
+    def full_price(self):
+        if self.price is not None:
+            return f'{floatformat(self.price, -2)} {self.price_currency.displayed_name}'
+
+    full_price.short_description = 'Ставка'
 
     def save(
             self, force_insert=False, force_update=False, using=None, update_fields=None

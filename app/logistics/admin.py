@@ -2,19 +2,21 @@ import autocomplete_all as admin
 from django.contrib.admin import DateFieldListFilter, TabularInline
 from django.contrib.admin.widgets import AutocompleteSelect, RelatedFieldWidgetWrapper
 from django.db import models
-from django.forms import TextInput, Textarea, NumberInput
+from django.db.models import OuterRef, Subquery
+from django.forms import TextInput, Textarea, NumberInput, ModelForm
 from django import forms
 from rangefilter.filters import DateRangeFilterBuilder
 from admin_auto_filters.filters import AutocompleteFilter
 
 from cats.models import Package
-from logistics.models import Order, Cargo, OrderStatus, AttachedDocument
+from logistics.models import Order, Cargo, OrderStatus, AttachedDocument, ORDER_STATUS_LABELS
 
 
 class CargoInline(admin.TabularInline):
     model = Cargo
     extra = 0
     classes = ['collapse']
+    min_num = 1
 
     formfield_overrides = {
         models.CharField: {'widget': TextInput(attrs={'size': '20'})},
@@ -27,10 +29,16 @@ class CargoInline(admin.TabularInline):
         return queryset.select_related('package').prefetch_related('params')
 
 
+class AlwaysChangedModelForm(ModelForm):
+    def has_changed(self):
+        return True
+
+
 class OrderStatusInline(admin.TabularInline):
     model = OrderStatus
     extra = 0
     classes = ['collapse']
+    form = AlwaysChangedModelForm
 
 
 class DocsInline(admin.TabularInline):
@@ -47,6 +55,26 @@ class ClientFilter(AutocompleteFilter):
 class ManagerFilter(AutocompleteFilter):
     field_name = 'manager'
     title = 'Менеджер'
+
+
+class ClientEmployeeFilter(AutocompleteFilter):
+    field_name = 'client_employee'
+    title = 'Сотрудник заказчика'
+
+
+class StatusFilter(admin.SimpleListFilter):
+    title = 'Статус'
+    parameter_name = 'status'
+
+    def queryset(self, request, queryset):
+        status_name = request.GET.get(self.parameter_name)
+        if status_name is not None:
+            statuses = OrderStatus.objects.filter(order=OuterRef('pk'))
+            return queryset.annotate(status=Subquery(statuses.values('name')[:1])).filter(status=status_name)
+        return queryset
+
+    def lookups(self, request, model_admin):
+        return ORDER_STATUS_LABELS
 
 
 @admin.register(Order)
@@ -94,8 +122,8 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = 'sum_weight', 'sum_volume', 'sum_quantity', 'status'
     inlines = CargoInline, OrderStatusInline, DocsInline
     list_display = ('number', 'date', 'client_number', 'client', 'from_address_short', 'to_address_short',
-                    'from_address_full', 'to_address_full',)
-    list_filter = ClientFilter, ManagerFilter, ('date', DateRangeFilterBuilder()),
+                    'status_short', 'full_price',)
+    list_filter = ClientFilter, ManagerFilter, ClientEmployeeFilter, ('date', DateRangeFilterBuilder()), StatusFilter
 
     def get_queryset(self, request):
         queryset = super(OrderAdmin, self).get_queryset(request)

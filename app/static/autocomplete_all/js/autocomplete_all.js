@@ -1,40 +1,3 @@
-/*
-This is workaround for pure behaviour of autocomplete_fields in Django (2,3).
-Probably you cannot modify the native Django ajax url (../autocomplete/) and you can only access the Referer url.
-
-Lets say, you have 2 <select>s with same ForeignKey (example: User).
-In such case you cannot identify on the server-side (in get_search_results) which one <select> is active.
-This trick will extend the Referer url to give more info to the server-side.
-Basically ?key=<fieldname> will be added to identify the <select>
-    but you can add more (see bellow) and implement dynamic filters (dependent on current form values) too.
-
-EXAMPLE:
-this is automatically called: source ModelAdmin, class Media, js = ('autocomplete_all/js/autocomplete_all.js',)
-target ModelAdmin:
-    def get_search_results(self, request, queryset, search_term):
-        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
-        if request.is_ajax and '/autocomplete/' in request.path:
-            url = urllib.parse.urlparse(request.headers['Referer'])
-            referer = url.path
-            qs = urllib.parse.parse_qs(url.query)
-            if '/npo/finding/' in referer:            # /<app>/<model>/
-                if qs.get('key') == ['id_process']:   # <field ~ foreignkey> (parse_qs results are lists)
-                    queryset = queryset.filter(...)
-        return queryset, use_distinct
-*/
-
-/* I leave this, not able make the fake Admin working outside of Admin */
-// /* Django native admin/js/autocomplete.js depends on presence of django.jQuery.
-//    Outside of Admin, if this .js is called before autocomplete.js, following will make possible autocomplete.js to work.
-//    This is skipped inside Admin where django.jQuery exists.
-// */
-// if (typeof(django) === "undefined") {
-//     django = {};
-// }
-// if (typeof(django.jQuery) === "undefined") {
-//     django.jQuery = $;
-// }
-
 function erasePrefix(s, _prefix) {
     if (!_prefix) {
         return s
@@ -43,8 +6,11 @@ function erasePrefix(s, _prefix) {
 }
 
 function getPrefix(fieldId, toName=true) {
+    if (fieldId.includes('filter')) {
+        return ''
+    }
     if (toName) {
-        return fieldId.substring(3).split('-').slice(0, -1).join('-')
+        fieldId = fieldId.substring(3)
     }
     return fieldId.split('-').slice(0, -1).join('-')
 }
@@ -74,47 +40,41 @@ function sanitize(string) {  // https://stackoverflow.com/questions/2794137/sani
     return string.replace(reg, (match)=>(map[match]));
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-    (function ($) {
-        $('select.admin-autocomplete').on('select2:opening', function (evt) {
-            if (!window.history.orig_pathname) {
-                window.history.orig_pathname = window.location.pathname;
+django.jQuery(document).ready(function () {
+    window.history.orig_pathname = undefined;
+    const select2 = django.jQuery('select.admin-autocomplete')
+    select2.on('select2:opening', function (evt) {
+        if (!window.history.orig_pathname) {
+            window.history.orig_pathname = window.location.pathname + window.location.search;
+        }
+        let prefix = getPrefix(this.id, false)
+        this.modified_location_search_key = '?key=' + erasePrefix(this.id, prefix);
+        this.modified_location_search = this.modified_location_search_key + expand_ajax_params(django.jQuery, this.id);
+        window.history.replaceState(null, null, window.location.pathname + this.modified_location_search);
+    });
+    select2.on('select2:closing', function (evt) {
+        if (!window.history.orig_pathname) {
+            window.history.orig_pathname = window.location.pathname + window.location.search;
+        }
+        let keypart = (window.location.search + '&').split('&', 1)[0];
+        if (keypart === this.modified_location_search_key) {  // opening of new runs earlier of closing the old one :(
+            window.history.replaceState(null, null, window.history.orig_pathname);
+        }
+        let elem = django.jQuery(this)
+        if (elem.parents('#grp-filters').length > 0 || elem.parents('#changelist-filter').length > 0) {
+            let val = django.jQuery(this).val() || '';
+            let class_name = this.className;
+            let param = this.name;
+            if (class_name.includes('admin-autocomplete'))
+            {
+                window.location.search = search_replace(param, val);
             }
-            let prefix = getPrefix(this.id, false)
-            this.modified_location_search_key = '?key=' + erasePrefix(this.id, prefix);
-            this.modified_location_search = this.modified_location_search_key + expand_ajax_params($, this.id);
-            window.history.replaceState(null, null, window.history.orig_pathname + this.modified_location_search);
-        });
-        $('select.admin-autocomplete').on('select2:closing', function (evt) {
-            var keypart = (window.location.search + '&').split('&', 1)[0];
-            if (keypart === this.modified_location_search_key) {  // opening of new runs earlier of closing the old one :(
-                window.history.replaceState(null, null, window.history.orig_pathname);
-            }
-        });
-    })(django.jQuery || $);
+        }
+    });
 });
 
-/*
-If you need dynamic filter based on some current value of other field in your admin form then:
-You can add second (yours) ModelAdmin Media js file and there rewrite the function expand_ajax_params.
-Example:
-In ModelAdmin, class Media: js = ('autocomplete_all/js/autocomplete_all.js', <myapp>/js/autocomplete_asset.js)
-In autocomplete_asset.js:
-function expand_ajax_params($, key) {
-    if (key === 'id_asset') {          // we need dynamic filtering with 'asset' foreignkey only
-        return '&city=' + $('#id_city').val() + &country=' + $('#id_country').val();   // ie. give only assets from London+UK
-    } else {
-        return ''
-    }
-}
-(Or you could make it easier and give parameters always regardless on the current <select>:
-    just remove the if/else and use the 1st return only.)
-*/
-
-// the default function adds nothing to params (except of ?key=..)
-//  but you can rewrite this function in particular js file (entered as 2nd one in Source admin, class Media, js=(.., ..))
 const prohibitedNames = [
-    'csrfmiddlewaretoken',
+    'csrfmiddlewaretoken', 'action'
 ]
 
 function expand_ajax_params($, fieldId) {
@@ -167,5 +127,4 @@ function expand_ajax_params($, fieldId) {
         }
     })
     return expanded;
-    // return '&country=' + $('#id_country').val();
 }
