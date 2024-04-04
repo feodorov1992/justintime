@@ -8,7 +8,7 @@ from django.db.models import QuerySet
 from django.template.defaultfilters import floatformat
 from django.utils import timezone
 
-from app.models import AbstractModel
+from app.models import AbstractModel, NumberFieldProcessor
 from app_auth.models import User
 from cats.models import Currency, Service, Package, CargoParam
 from geo.models import Country, City
@@ -44,6 +44,26 @@ def default_order_number(number: Union[int, str] = None):
 def int_only_validator(value: str):
     if not value.isnumeric() or not len(value) == 5:
         raise ValidationError('Номер должен быть целым 5-значным числом. Допустимо начинать с 0')
+
+
+class WeightProcessor(NumberFieldProcessor):
+    output_field = 'sum_weight'
+    fields = 'weight', 'quantity'
+    float_round = 3
+
+
+class VolumeProcessor(NumberFieldProcessor):
+    output_field = 'sum_volume'
+    fields = 'length', 'width', 'height', 'quantity'
+    float_round = 3
+
+    def process_result(self, values_list, coefficient=None):
+        return super().process_result(values_list, 1 / 1000000)
+
+
+class QuantityProcessor(NumberFieldProcessor):
+    output_field = 'sum_quantity'
+    fields = 'quantity',
 
 
 class Order(AbstractModel):
@@ -113,6 +133,8 @@ class Order(AbstractModel):
     sum_weight = models.FloatField(verbose_name='Вес брутто груза, кг', blank=True, null=True)
     sum_volume = models.FloatField(verbose_name='Объем груза, м3', blank=True, null=True)
     sum_quantity = models.IntegerField(verbose_name='Кол-во мест', blank=True, null=True)
+
+    related_fields_mappers = WeightProcessor, QuantityProcessor, VolumeProcessor
 
     def sum_cargo_params(self, queryset: QuerySet = None, commit: bool = False):
         if queryset is None:
@@ -246,6 +268,8 @@ class Order(AbstractModel):
     ):
         if self.insurance_needed and not self.insurance_beneficiary:
             self.insurance_beneficiary = self.client
+        # for key, value in self.get_state_changes().items():
+        #     print(key, value)
         super(Order, self).save(force_insert, force_update, using, update_fields)
 
     def __str__(self):

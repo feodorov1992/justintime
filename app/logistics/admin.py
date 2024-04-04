@@ -124,6 +124,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ('number', 'date', 'client_number', 'client', 'from_address_short', 'to_address_short',
                     'status_short', 'full_price',)
     list_filter = ClientFilter, ManagerFilter, ClientEmployeeFilter, ('date', DateRangeFilterBuilder()), StatusFilter
+    old_state = None
 
     def get_queryset(self, request):
         queryset = super(OrderAdmin, self).get_queryset(request)
@@ -133,6 +134,23 @@ class OrderAdmin(admin.ModelAdmin):
             'from_country', 'from_city', 'to_country', 'to_city'
         )
 
+    def get_object(self, request, object_id, from_field=None):
+        obj = super().get_object(request, object_id, from_field)
+        self.old_state = obj.get_state(related_objects='cargos')
+        return obj
+
+    def save_model(self, request, obj, form, change):
+        super(OrderAdmin, self).save_model(request, obj, form, change)
+
+    def save_related(self, request, form, formsets, change):
+        super(OrderAdmin, self).save_related(request, form, formsets, change)
+        new_state = form.instance.get_state(related_objects='cargos')
+        print(self.old_state)
+        print(new_state)
+        print(form.instance.get_state_changes(self.old_state, new_state))
+
     def save_formset(self, request, form, formset, change):
         super(OrderAdmin, self).save_formset(request, form, formset, change)
-        formset.instance.sum_cargo_params(commit=True)
+        # if formset.model is Cargo:
+        #     print(f'{formset.model.__name__} formset is being saved!')
+        #     formset.instance.sum_cargo_params(commit=True)
