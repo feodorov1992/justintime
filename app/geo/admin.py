@@ -29,10 +29,6 @@ class CountryAdmin(admin.ModelAdmin):
     search_fields = 'name',
     inlines = CityInline,
 
-    def get_search_results_ajax(self, queryset, referer: str, key: str, urlparams: dict):
-        print(referer, key, urlparams)
-        return queryset
-
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin, AdminAjaxMixin):

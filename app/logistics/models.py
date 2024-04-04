@@ -85,6 +85,7 @@ class Order(AbstractModel):
                                      verbose_name='Страна происхождения груза', related_name='cargo_origin_in_orders')
     cargo_value = models.FloatField(verbose_name='Заявленная стоимость груза')
     cargo_value_currency = models.ForeignKey(Currency, on_delete=models.PROTECT,
+                                             default=Currency.get_default_pk,
                                              verbose_name='Валюта стоимости груза',
                                              related_name='cargo_value_currency_in_orders')
     insurance_needed = models.BooleanField(default=False, verbose_name='Страхование требуется')
@@ -95,7 +96,7 @@ class Order(AbstractModel):
                                               verbose_name='Выгодоприобретатель',
                                               related_name='beneficiary_in_orders')
     price = models.FloatField(blank=True, null=True, verbose_name='Ставка')
-    price_currency = models.ForeignKey(Currency, on_delete=models.PROTECT,
+    price_currency = models.ForeignKey(Currency, on_delete=models.PROTECT, default=Currency.get_default_pk,
                                        verbose_name='Валюта ставки', related_name='price_currency_in_orders')
 
     from_org = models.ForeignKey(Organisation, on_delete=models.PROTECT,
@@ -150,24 +151,34 @@ class Order(AbstractModel):
         )
 
         self.sum_weight = round(aggregate['sum_weight'] or 0, 2)
-        self.sum_volume = round(aggregate['sum_volume'] or 0 / 1000000, 3)
+        self.sum_volume = round((aggregate['sum_volume'] or 0) / 1000000, 3)
         self.sum_quantity = aggregate['sum_quantity'] or 0
         if commit:
             self.save()
 
         return aggregate
 
+    def check_related_fields(self, child_name, child_parent_name, self_parent_name, error_dict, error_msg):
+        if hasattr(self, child_name):
+            child = getattr(self, child_name)
+            child_parent = getattr(child, child_parent_name, None)
+            self_parent = getattr(self, self_parent_name, None)
+            if child_parent and self_parent and child_parent != self_parent:
+                error_dict[child_name] = error_msg
+
     def clean(self):
         errors = dict()
         super(Order, self).clean()
-        if self.contract and self.contract.organization_id != self.client_id:
-            errors['contract'] = 'При изменении заказчика необходимо изменить договор!'
-        if self.client_employee and self.client_employee.organization_id != self.client_id:
-            errors['client_employee'] = 'При изменении заказчика необходимо изменить сотрудника!'
-        if self.from_city and self.from_city.country_id != self.from_country_id:
-            errors['from_city'] = 'При изменении страны необходимо изменить город!'
-        if self.to_city and self.to_city.country_id != self.to_country_id:
-            errors['to_city'] = 'При изменении страны необходимо изменить город!'
+
+        self.check_related_fields('contract', 'organization_id', 'client_id', errors,
+                                  'При изменении заказчика необходимо изменить договор!')
+        self.check_related_fields('client_employee', 'organization_id', 'client_id', errors,
+                                  'При изменении заказчика необходимо изменить сотрудника!')
+        self.check_related_fields('from_city', 'country_id', 'from_country_id', errors,
+                                  'При изменении страны необходимо изменить город!')
+        self.check_related_fields('to_city', 'country_id', 'to_country_id', errors,
+                                  'При изменении страны необходимо изменить город!')
+
         if errors:
             raise ValidationError(errors)
 
@@ -270,6 +281,8 @@ class Order(AbstractModel):
             self.insurance_beneficiary = self.client
         # for key, value in self.get_state_changes().items():
         #     print(key, value)
+        if self.__class__.objects.filter(pk=self.pk):
+            self.sum_cargo_params(commit=False)
         super(Order, self).save(force_insert, force_update, using, update_fields)
 
     def __str__(self):

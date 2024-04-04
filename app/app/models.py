@@ -182,6 +182,15 @@ class AbstractModel(models.Model):
 
         return result
 
+    def send_creation_email(self, user):
+        pass
+
+    def send_change_email(self, user, data):
+        pass
+
+    def humanize(self, changes_dict):
+        pass
+
     class Meta:
         abstract = True
 

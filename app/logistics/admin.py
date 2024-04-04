@@ -8,6 +8,7 @@ from django import forms
 from rangefilter.filters import DateRangeFilterBuilder
 from admin_auto_filters.filters import AutocompleteFilter
 
+from app.models import AbstractModel
 from cats.models import Package
 from logistics.models import Order, Cargo, OrderStatus, AttachedDocument, ORDER_STATUS_LABELS
 
@@ -139,18 +140,23 @@ class OrderAdmin(admin.ModelAdmin):
         self.old_state = obj.get_state(related_objects='cargos')
         return obj
 
-    def save_model(self, request, obj, form, change):
-        super(OrderAdmin, self).save_model(request, obj, form, change)
-
     def save_related(self, request, form, formsets, change):
         super(OrderAdmin, self).save_related(request, form, formsets, change)
-        new_state = form.instance.get_state(related_objects='cargos')
-        print(self.old_state)
-        print(new_state)
-        print(form.instance.get_state_changes(self.old_state, new_state))
+        form.instance.save()
+        if self.old_state is None:
+            form.instance.send_creation_email(request.user)
+        else:
+            form.instance.send_change_email(
+                request.user, form.instance.get_state_changes(
+                    self.old_state, form.instance.get_state(related_objects='cargos')
+                )
+            )
 
-    def save_formset(self, request, form, formset, change):
-        super(OrderAdmin, self).save_formset(request, form, formset, change)
-        # if formset.model is Cargo:
-        #     print(f'{formset.model.__name__} formset is being saved!')
-        #     formset.instance.sum_cargo_params(commit=True)
+    def add_view(self, request, form_url="", extra_context=None):
+        self.old_state = None
+        return super(OrderAdmin, self).add_view(request, form_url, extra_context)
+
+    def get_changeform_initial_data(self, request):
+        data = super(OrderAdmin, self).get_changeform_initial_data(request)
+        data['manager'] = request.user
+        return data
