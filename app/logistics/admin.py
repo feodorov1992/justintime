@@ -40,6 +40,7 @@ class OrderStatusInline(admin.TabularInline):
     extra = 0
     classes = ['collapse']
     form = AlwaysChangedModelForm
+    verbose_name_plural = 'Прошлые статусы заявки'
 
 
 class DocsInline(admin.TabularInline):
@@ -84,7 +85,7 @@ class OrderAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': (
             ('number', 'date'),
-            'status',
+            ('status', 'status_updated'),
             ('client_number', 'gov_contract_number'),
             'service_marks', 'tracking_url'
         )}),
@@ -120,7 +121,7 @@ class OrderAdmin(admin.ModelAdmin):
             ('insurance_premium', 'insurance_sum_rate', 'insurance_beneficiary'),
         )})
     )
-    readonly_fields = 'sum_weight', 'sum_volume', 'sum_quantity', 'status'
+    readonly_fields = 'sum_weight', 'sum_volume', 'sum_quantity', 'status_updated'
     inlines = CargoInline, OrderStatusInline, DocsInline
     list_display = ('number', 'date', 'client_number', 'client', 'from_address_short', 'to_address_short',
                     'status_short', 'full_price',)
@@ -131,7 +132,6 @@ class OrderAdmin(admin.ModelAdmin):
         queryset = super(OrderAdmin, self).get_queryset(request)
         return queryset.prefetch_related('orderstatus_set').select_related(
             'client', 'client_employee', 'manager',
-            # 'cargo_origin', 'cargo_value_currency', 'insurance_beneficiary', 'price_currency',
             'from_country', 'from_city', 'to_country', 'to_city'
         )
 
@@ -142,15 +142,11 @@ class OrderAdmin(admin.ModelAdmin):
 
     def save_related(self, request, form, formsets, change):
         super(OrderAdmin, self).save_related(request, form, formsets, change)
-        form.instance.save()
+        new_state = form.instance.get_state(related_objects='cargos')
         if self.old_state is None:
-            form.instance.send_creation_email(request.user)
+            form.instance.object_created(request.user, new_state)
         else:
-            form.instance.send_change_email(
-                request.user, form.instance.get_state_changes(
-                    self.old_state, form.instance.get_state(related_objects='cargos')
-                )
-            )
+            form.instance.object_updated(request.user, self.old_state, new_state)
 
     def add_view(self, request, form_url="", extra_context=None):
         self.old_state = None

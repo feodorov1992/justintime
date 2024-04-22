@@ -1,9 +1,11 @@
+import datetime
 import uuid
 from typing import Union, Iterable
 
 from django.db import models
 from django.db.models import QuerySet
 from django.forms import model_to_dict
+from django.template.defaultfilters import floatformat
 
 
 class RelatedFieldProcessor:
@@ -151,7 +153,7 @@ class AbstractModel(models.Model):
         obj = self.map_related(obj)
         return obj
 
-    def get_state_changes(self, old_state: dict = None, new_state: dict = None, flat: bool = False):
+    def get_state_changes(self, old_state: dict = None, new_state: dict = None):
         if old_state is None:
             old_state = self.get_state(self.__class__.objects.get(pk=self.pk))
         if new_state is None:
@@ -175,20 +177,37 @@ class AbstractModel(models.Model):
                     'new': new_value
                 }
 
-        if flat:
-            return [
-                [key, value['old'], value['new']] for key, value in result.items()
-            ]
-
         return result
 
-    def send_creation_email(self, user):
+    @staticmethod
+    def clean_value(value):
+        if isinstance(value, float) or isinstance(value, int):
+            return floatformat(value, -2)
+        elif isinstance(value, datetime.datetime):
+            return value.strftime('%d.%m.%Y %H:%M:%S')
+        elif isinstance(value, datetime.date):
+            return value.strftime('%d.%m.%Y')
+        elif not value:
+            return '-'
+        return str(value)
+
+    def humanize_changes(self, changes_dict, flat=False):
+        verbose_names = {field.name: field.verbose_name for field in self._meta.fields}
+        result = [
+            {
+                'verbose': verbose_names.get(key, key),
+                'old': self.clean_value(value.get('old')),
+                'new': self.clean_value(value.get('new'))
+            } for key, value in changes_dict.items()
+        ]
+        if flat:
+            return [[item.get('verbose'), item.get('old'), item.get('new')] for item in result]
+        return result
+
+    def object_created(self, request):
         pass
 
-    def send_change_email(self, user, data):
-        pass
-
-    def humanize(self, changes_dict):
+    def object_updated(self, request, old_state: dict = None, new_state: dict = None):
         pass
 
     class Meta:

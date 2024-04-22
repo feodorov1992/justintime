@@ -31,7 +31,7 @@ ORDER_STATUS_LABELS = (
 
 def default_order_number(number: Union[int, str] = None):
     if number is None:
-        obj = Order.objects.last()
+        obj = Order.objects.first()
         if obj is None:
             number = getattr(settings, 'START_ORDER_NUMBER', 1)
         else:
@@ -127,6 +127,11 @@ class Order(AbstractModel):
     to_date_plan = models.DateField(blank=True, null=True, verbose_name='Дата доставки (план)')
     to_date_fact = models.DateField(blank=True, null=True, verbose_name='Дата доставки (факт)')
 
+    status = models.CharField(max_length=20, choices=ORDER_STATUS_LABELS, default=ORDER_STATUS_LABELS[0][0],
+                              verbose_name='Статус')
+    status_updated = models.DateTimeField(editable=False, verbose_name='Время изменения статуса',
+                                          null=True, blank=True)
+
     tracking_url = models.URLField(verbose_name='Ссылка на отслеживание', blank=True, null=True)
     services = models.ManyToManyField(Service, verbose_name='Доп. услуги', blank=True)
     comment = models.TextField(verbose_name='Примечание', blank=True, null=True)
@@ -181,11 +186,6 @@ class Order(AbstractModel):
 
         if errors:
             raise ValidationError(errors)
-
-    def status(self):
-        return self.orderstatus_set.first()
-
-    status.short_description = 'Статус'
 
     def status_short(self):
         return self.orderstatus_set.first().get_name_display()
@@ -275,15 +275,37 @@ class Order(AbstractModel):
     full_price.short_description = 'Ставка'
 
     def save(
-            self, force_insert=False, force_update=False, using=None, update_fields=None
+        self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
         if self.insurance_needed and not self.insurance_beneficiary:
             self.insurance_beneficiary = self.client
-        # for key, value in self.get_state_changes().items():
-        #     print(key, value)
-        if self.__class__.objects.filter(pk=self.pk):
-            self.sum_cargo_params(commit=False)
         super(Order, self).save(force_insert, force_update, using, update_fields)
+
+    def object_created(self, request, new_state: dict = None):
+        changes = self.get_state_changes(old_state=dict(), new_state=new_state)
+        for key, value in changes.items():
+            if key.startswith('sum'):
+                self.__setattr__(key, value.get('new'))
+        self.status_updated = self.created_at
+        self.save()
+
+    def object_updated(self, request, old_state: dict = None, new_state: dict = None):
+        changes = self.get_state_changes(old_state=old_state, new_state=new_state)
+        updated = False
+        if 'status' in changes:
+            OrderStatus.objects.create(
+                name=changes.get('status').get('old'), change_time=self.status_updated, order=self
+            )
+            self.status_updated = timezone.now()
+            updated = True
+        for key, value in changes.items():
+            current_value = self.__getattribute__(key)
+            new_value = value.get('new')
+            if current_value != new_value:
+                self.__setattr__(key, value.get('new'))
+                updated = True
+        if updated:
+            self.save()
 
     def __str__(self):
         return f'Заявка №{self.number} от {self.date.strftime("%d.%m.%Y")}'
@@ -291,7 +313,7 @@ class Order(AbstractModel):
     class Meta:
         verbose_name = 'заявка на перевозку'
         verbose_name_plural = 'заявки на перевозку'
-        ordering = 'number', 'created_at'
+        ordering = '-number', '-created_at'
 
 
 class Cargo(AbstractModel):
