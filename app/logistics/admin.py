@@ -127,6 +127,9 @@ class OrderAdmin(admin.ModelAdmin):
                     'status_short', 'full_price',)
     list_filter = ClientFilter, ManagerFilter, ClientEmployeeFilter, ('date', DateRangeFilterBuilder()), StatusFilter
     old_state = None
+    change_form_template = 'admin/order_change.html'
+    tech_fields = '_state', 'id', 'created_at', 'last_update'
+    exclude_from_copy_fields = 'number', 'date', 'status'
 
     def get_queryset(self, request):
         queryset = super(OrderAdmin, self).get_queryset(request)
@@ -152,7 +155,34 @@ class OrderAdmin(admin.ModelAdmin):
         self.old_state = None
         return super(OrderAdmin, self).add_view(request, form_url, extra_context)
 
+    def copy_object(self, obj):
+        obj_dict = obj.__dict__
+        for field in obj._meta.many_to_many:
+            print(obj.__getattribute__(field.name))
+            obj_dict[field.name] = list(obj.__getattribute__(field.name).all())
+
+        for field in self.tech_fields + self.exclude_from_copy_fields:
+            obj_dict.pop(field)
+
+        for key in list(obj_dict.keys()):
+            if key.endswith('_id'):
+                new_key = key[:-3]
+                obj_dict[new_key] = obj_dict.pop(key)
+
+        return obj_dict
+
     def get_changeform_initial_data(self, request):
+        copy_order_pk = request.GET.get('copy_order')
+        if copy_order_pk:
+            copy_order = self.model.objects.get(pk=copy_order_pk)
+            return self.copy_object(copy_order)
+
         data = super(OrderAdmin, self).get_changeform_initial_data(request)
         data['manager'] = request.user
         return data
+
+    def render_change_form(
+        self, request, context, add=False, change=False, form_url="", obj=None
+    ):
+        print(context.get('adminform').form.initial)
+        return super(OrderAdmin, self).render_change_form(request, context, add, change, form_url, obj)

@@ -1,0 +1,5 @@
+{% extends 'admin/change_form.html' %}
+{% block object-tools %}
+    {% if adminform.form.instance.pk %}<a href="{% url 'admin:logistics_order_add' %}?copy_order={{ adminform.form.instance.pk }}">Копировать заявку</a>{% endif %}
+    {{ block.super }}
+{% endblock %}

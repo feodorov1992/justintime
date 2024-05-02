@@ -8,3 +8,4 @@ redis
 django-filter
 django-admin-autocomplete-all
 django-admin-rangefilter
+django-select2

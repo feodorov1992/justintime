@@ -302,7 +302,11 @@ class Order(AbstractModel):
             current_value = self.__getattribute__(key)
             new_value = value.get('new')
             if current_value != new_value:
-                self.__setattr__(key, value.get('new'))
+                m2m = {field.name: field for field in self._meta.many_to_many}
+                if key not in m2m:
+                    self.__setattr__(key, new_value)
+                else:
+                    self.__getattribute__(key).set(new_value)
                 updated = True
         if updated:
             self.save()
