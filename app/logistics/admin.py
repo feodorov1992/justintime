@@ -1,8 +1,11 @@
+import uuid
+
 import autocomplete_all as admin
-from django.contrib.admin import DateFieldListFilter, TabularInline
+from django.contrib.admin import DateFieldListFilter, TabularInline, action
+from django.contrib.admin.helpers import ACTION_CHECKBOX_NAME
 from django.contrib.admin.widgets import AutocompleteSelect, RelatedFieldWidgetWrapper
 from django.db import models
-from django.db.models import OuterRef, Subquery
+from django.db.models import OuterRef, Subquery, ForeignKey, ManyToManyField
 from django.forms import TextInput, Textarea, NumberInput, ModelForm
 from django import forms
 from rangefilter.filters import DateRangeFilterBuilder
@@ -10,6 +13,7 @@ from admin_auto_filters.filters import AutocompleteFilter
 
 from app.models import AbstractModel
 from cats.models import Package
+from docs.generators import XLSGenerator
 from logistics.models import Order, Cargo, OrderStatus, AttachedDocument, ORDER_STATUS_LABELS
 
 
@@ -130,6 +134,48 @@ class OrderAdmin(admin.ModelAdmin):
     change_form_template = 'admin/order_change.html'
     tech_fields = '_state', 'id', 'created_at', 'last_update'
     exclude_from_copy_fields = 'number', 'date', 'status'
+    actions = 'download_excel',
+    act_on_filtered = 'download_excel',
+
+    def get_fields_list(self, model=None, exclude=None):
+        if model is None:
+            model = self.model
+        if exclude is None:
+            exclude = []
+        return [i for i in model._meta._forward_fields_map if not i.endswith('id') and i not in exclude]
+
+    def get_related_fields_list(self, model=None, exclude=None):
+        if model is None:
+            model = self.model
+        if exclude is None:
+            exclude = []
+        return [
+            key for key, value in model._meta._forward_fields_map.items() if
+            key not in exclude and not key.endswith('id') and isinstance(value, ForeignKey)
+        ]
+
+    def get_m2m_fields_list(self, model=None, exclude=None):
+        if model is None:
+            model = self.model
+        if exclude is None:
+            exclude = []
+        return [
+            key for key, value in model._meta._forward_fields_map.items() if
+            key not in exclude and not key.endswith('id') and isinstance(value, ManyToManyField)
+        ]
+
+    @action(description="Выгрузить в Excel")
+    def download_excel(self, request, queryset):
+        if not queryset:
+            if request.GET:
+                queryset = queryset.model.objects.filter(**request.GET.dict())
+            else:
+                queryset = queryset.model.objects.all()
+        generator = XLSGenerator(self.model, self.get_fields_list())
+        response = generator.response(
+            queryset.select_related(*self.get_related_fields_list()).prefetch_related(*self.get_m2m_fields_list())
+        )
+        return response
 
     def get_queryset(self, request):
         queryset = super(OrderAdmin, self).get_queryset(request)
@@ -186,3 +232,11 @@ class OrderAdmin(admin.ModelAdmin):
     ):
         print(context.get('adminform').form.initial)
         return super(OrderAdmin, self).render_change_form(request, context, add, change, form_url, obj)
+
+    def changelist_view(self, request, extra_context=None):
+        if request.POST.get('action', '') in self.act_on_filtered:
+            if not request.POST.getlist(ACTION_CHECKBOX_NAME):
+                post = request.POST.copy()
+                post.setlist(ACTION_CHECKBOX_NAME, [uuid.uuid4()])
+                request._set_post(post)
+        return super(OrderAdmin, self).changelist_view(request, extra_context)
