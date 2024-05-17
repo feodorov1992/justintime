@@ -1,0 +1,156 @@
+{% extends 'logistics/base.html' %}
+{% block title %}Лента заявок{% endblock %}
+{% block content %}
+    <div class="submenu">
+        <div class="links">
+            <a class="selected" href="">Лента заявок</a>
+            <a href="">Лента быстрых заявок</a>
+        </div>
+        <div class="buttons">
+            <a href="" class="button">Создать заявку</a>
+            <a href="" class="button">Быстрая заявка</a>
+        </div>
+    </div>
+    <div class="ol-content">
+        <div class="filter-form">
+            <h2>Фильтры</h2>
+            <form method="get">
+                <div class="filter-row">
+                    {{ filter.form.client.label_tag }}
+                    <div class="wide-field">
+                        {{ filter.form.client }}
+                    </div>
+                </div>
+                <div class="filter-row">
+                    {{ filter.form.manager.label_tag }}
+                    <div class="wide-field">
+                        {{ filter.form.manager }}
+                    </div>
+                </div>
+                <div class="filter-row">
+                    {{ filter.form.status.label_tag }}
+                    <div class="wide-field">
+                        {{ filter.form.status }}
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <label>Дата</label>
+                    <div class="wide-field">
+                        <div class="narrow-field">
+                            {{ filter.form.date__gte.label_tag }}
+                            {{ filter.form.date__gte }}
+                        </div>
+                        <div class="narrow-field">
+                            {{ filter.form.date__lte.label_tag }}
+                            {{ filter.form.date__lte }}
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-row">
+                    {{ filter.form.search.label_tag }}
+                    <div class="wide-field">
+                        {{ filter.form.search }}
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <div class="filter-center">
+                        <input class="filter-submit button" type="submit" value="Применить фильтры" />
+                    </div>
+                </div>
+                <div class="filter-row">
+                    <div class="filter-center">
+                        <a class="filter-clear" href="{{ request.path }}">Очистить фильтры</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="orders-list">
+            {% for obj in page_obj %}
+                <div class="orders-list-item">
+                    <div class="orders-list-item-content">
+                        <div class="ol-col">
+                            <p>
+                                <span>Номер заявки</span>
+                                <span><b>{{ obj.number }}</b></span>
+                            </p>
+                            <p>
+                                {% if obj.client_number %}
+                                <span>Клиентский номер</span>
+                                <span><b>{{ obj.client_number }}</b></span>
+                                {% else %}
+                                &nbsp;
+                                {% endif %}
+                            </p>
+                            <p>&nbsp;</p>
+                            <p>
+                                <span>Пункт отправки</span>
+                            </p>
+                            <p>
+                                <span><b>{{ obj.from_address_short }}</b></span>
+                            </p>
+                        </div>
+                        <div class="ol-col">
+                            <p>
+                                <span>Дата заявки</span>
+                                <span><b>{{ obj.date|date:"SHORT_DATE_FORMAT" }}</b></span>
+                                <span>Статус</span>
+                                <span><b style="color: #19A216">{{ obj.get_status_display }}</b></span>
+                            </p>
+                            <p>
+                                {% if obj.price %}
+                                <span>Ставка</span>
+                                <span><b>{{ obj.price|floatformat:-2 }} {{ obj.price_currency.displayed_name }}</b></span>
+                                {% else %}
+                                    &nbsp;
+                                {% endif %}
+                            </p>
+                            <p>&nbsp;</p>
+                            <p>
+                                <span>Пункт доставки</span>
+                            </p>
+                            <p>
+                                <span><b>{{ obj.to_address_short }}</b></span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="orders-list-item-links">
+                        <div class="links-group">
+                            <a href="">Подробный просмотр</a>
+                        </div>
+                        <div class="links-group">
+                            <a href="">Изменить</a>
+                            <a href="">Скопировать</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="pagination">
+            {% load i18n updateurl utils static %}
+            {% if paginator.num_pages > 1 %}
+            <span class="step-links">
+                {% if page_obj.has_previous %}
+                    <a href="{% update_query_string with 'page'=1 %}">&laquo; 1</a>
+                {% endif %}
+                {% if page_obj.previous_page_number > 1 %}
+                    <span>...</span>
+                    <a href="{% update_query_string with 'page'=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+                {% endif %}
+
+                <span class="current">{{ page_obj.number }}</span>
+
+                {% if page_obj.next_page_number < paginator.num_pages %}
+                    <a href="{% update_query_string with 'page'=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+                    <span>...</span>
+                {% endif %}
+
+                {% if page_obj.has_next  %}
+                    <a href="{% update_query_string with 'page'=paginator.num_pages %}">{{ paginator.num_pages }} &raquo;</a>
+                {% endif %}
+
+            </span>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -47,6 +47,7 @@ class User(AbstractModel, AbstractUser):
     class Meta:
         verbose_name = 'пользователь'
         verbose_name_plural = 'пользователи'
+        ordering = 'last_name',
 
 
 @receiver(post_save, sender=User)

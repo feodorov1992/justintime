@@ -38,8 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'autocomplete_all',
+    'django_select2',
     'rangefilter',
     'admin_auto_filters',
+    'django_genericfilters',
     'cats',
     'orgs',
     'geo',
@@ -123,6 +125,8 @@ AUTH_USER_MODEL = 'app_auth.User'
 
 USE_THOUSAND_SEPARATOR = True
 
+DATE_FORMAT = '%d.%m.%Y'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
@@ -149,3 +153,18 @@ EMAIL_PORT = '465'
 EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'feodorov1992@mail.ru'
 EMAIL_HOST_PASSWORD = 'sYN89wjsBz0KPFvRY9bp'
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache"
+    },
+    "select2": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://{REDIS_DOMAIN}:{REDIS_PORT}/2",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+SELECT2_CACHE_BACKEND = "select2"

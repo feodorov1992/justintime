@@ -204,7 +204,6 @@ class OrderAdmin(admin.ModelAdmin):
     def copy_object(self, obj):
         obj_dict = obj.__dict__
         for field in obj._meta.many_to_many:
-            print(obj.__getattribute__(field.name))
             obj_dict[field.name] = list(obj.__getattribute__(field.name).all())
 
         for field in self.tech_fields + self.exclude_from_copy_fields:

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Just In Time | {% block title %}{% endblock %}</title>
+    {% load static %}
+    <link href="{% static 'css/jit.css' %}" media="screen" rel="stylesheet">
+    <link href="{% static 'admin/css/vendor/select2/select2.min.css' %}" media="screen" rel="stylesheet">
+    <link href="{% static 'django_select2/django_select2.css' %}" media="screen" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="wrapper header-wrapper">
+            <div class="logo">
+                <a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo"></a>
+            </div>
+            <div class="menu">
+                <a href="">Лента заявок</a>
+                <a href="">Создать заявку</a>
+                <a href="">Быстрая заявка</a>
+                <a href=""><img src="{% static 'img/profile.svg' %}" alt="profile"></a>
+            </div>
+        </div>
+    </header>
+    <div id="content">
+        <div class="wrapper">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    <footer>
+        <div class="wrapper"></div>
+    </footer>
+    <script src="{% static 'js/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'admin/js/vendor/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'admin/js/vendor/select2/i18n/ru.js' %}"></script>
+    <script src="{% static 'django_select2/django_select2.js' %}"></script>
+</body>
+</html>
