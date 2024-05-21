@@ -1,0 +1,217 @@
+{% extends 'logistics/base.html' %}
+{% block title %}Заявка № {{ order.number }}{% endblock %}
+{% block content %}{% load static %}
+    {% if request.META.HTTP_REFERER and request.META.HTTP_REFERER != request.build_absolute_uri %} <div class="back_url"><a href="{{request.META.HTTP_REFERER|escape}}"><img src="{% static 'img/lq.svg' %}" alt="">Вернуться в ленту заявок</a></div> {% endif %}
+    <div class="headline">
+        <h1>Информация по заявке № <span class="order_number">{{ order.number }}</span></h1>
+        <div>Дата создания заявки: <span class="field_value">{{ order.date|date:"SHORT_DATE_FORMAT" }}</span></div>
+        <div>Статус: <span onclick="getModalView('{% url 'order_status' pk=order.pk %}')" class="order_status {{ order.status }}">{{ order.get_status_display }}</span></div>
+        <div class="buttons">
+            {% if order.tracking_url %}<a class="button" href="{{ order.tracking_url }}" target="_blank">Отследить</a>{% endif %}
+            <a class="button" href="">Изменить</a>
+            <a class="button" href="">Скопировать</a>
+        </div>
+    </div>
+    <div class="table_list light_blue">
+        <div class="pseudo_table">
+            {% if request.user.is_staff %}
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Заказчик</div>
+                <div class="pseudo_th">{{ order.client }}</div>
+            </div>
+            {% endif %}
+            {% if order.client_number %}
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Клиентский номер</div>
+                <div class="pseudo_th">{{ order.client_number }}</div>
+            </div>
+            {% endif %}
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Договор</div>
+                <div class="pseudo_th">{{ order.contract.number }} от {{ order.contract.date|date:"SHORT_DATE_FORMAT" }}</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Ставка</div>
+                <div class="pseudo_th">{% if order.price %}{{ order.price|floatformat:-2 }} {{ order.price_currency.displayed_name }}{% else %}Не указана{% endif %}</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Менеджер</div>
+                <div class="pseudo_th">{% if order.manager %}{{ order.manager }}{% else %}Не назначен{% endif %}</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Наблюдатель</div>
+                <div class="pseudo_th">{% if order.client_employee %}{{ order.client_employee }}{% else %}Не назначен{% endif %}</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Наименование груза</div>
+                <div class="pseudo_th">{{ order.cargo_name }}</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Страна происхождения груза</div>
+                <div class="pseudo_th">{{ order.cargo_origin }}</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Заявленная стоимость груза</div>
+                <div class="pseudo_th">{{ order.cargo_value|floatformat:-2 }} {{ order.cargo_value_currency.displayed_name }}</div>
+                <div class="pseudo_td"><img src="{% if order.insurance_needed %}{% static 'img/text_checkmark.svg' %}{% else %}{% static 'img/text_cross.svg' %}{% endif %}" alt=""> Страхование требуется</div>
+            </div>
+            {% if order.insurance_needed %}
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Коэфицент страховой премии</div>
+                <div class="pseudo_th">{{ order.get_insurance_sum_rate_display }}</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Страховая премия</div>
+                <div class="pseudo_th">{% if order.insurance_premium %}{{ order.insurance_premium|floatformat:-2 }} {{ order.cargo_value_currency.displayed_name }}{% else %}Не указана{% endif %}</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Выгодоприобретатель</div>
+                <div class="pseudo_th">{{ order.insurance_beneficiary }}</div>
+            </div>
+            {% endif %}
+            {% if order.gov_contract_number %}
+            <div class="pseudo_tr">
+                <div class="pseudo_td">№ ИГК</div>
+                <div class="pseudo_th">{{ order.gov_contract_number }}</div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="pseudo_table">
+            <div class="pseudo_tr one_col">
+                <div class="pseudo_th">Доп. услуги</div>
+                <div class="pseudo_td">
+                    <ul class="no_bullets">
+                    {% for service in order.services.all %}
+                        <li><img src="{% static 'img/text_checkmark.svg' %}" alt=""> {{ service }}</li>
+                    {% empty %}
+                        <li><img src="{% static 'img/text_cross.svg' %}" alt=""> Не указаны</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% if order.comment %}
+            <div class="pseudo_tr one_col">
+                <div class="pseudo_th">Примечание</div>
+                <div class="pseudo_td">{{ order.comment|linebreaks }}</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="table_list">
+        <div class="pseudo_table">
+            <h3>Пункт отправки</h3>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Грузоотправитель</div>
+                <div class="pseudo_th">{{ order.from_org }}</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Дата готовности груза</div>
+                <div class="pseudo_th">{% if order.from_date_wanted %}{{ order.from_date_wanted|date:"SHORT_DATE_FORMAT" }}{% else %}Не указана{% endif %}</div>
+            </div>
+            <div class="pseudo_tr"><div class="pseudo_td">&nbsp</div></div>
+            <div class="pseudo_tr one_col multi">
+                <div>
+                    <div class="pseudo_td">Индекс</div>
+                    <div class="pseudo_th">{{ order.from_index }}</div>
+                </div>
+                <div>
+                    <div class="pseudo_td">Страна отправки</div>
+                    <div class="pseudo_th">{{ order.from_country }}</div>
+                </div>
+                <div>
+                    <div class="pseudo_td">Город отправки</div>
+                    <div class="pseudo_th">{{ order.from_city }}</div>
+                </div>
+            </div>
+            <div class="pseudo_tr one_col">
+                <div class="pseudo_td">Адрес отправки</div>
+                <div class="pseudo_th">{{ order.from_address }}</div>
+            </div>
+            <div class="pseudo_tr"><div class="pseudo_td">&nbsp</div></div>
+            <div class="pseudo_tr one_col">
+                <div class="pseudo_td">Контакты отправителя</div>
+                <div class="pseudo_th">{{ order.from_contacts|linebreaks }}</div>
+            </div>
+        </div>
+        <div class="pseudo_table">
+            <h3>Пункт доставки</h3>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Грузополучатель</div>
+                <div class="pseudo_th">{{ order.to_org }}</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Желаемая дата доставки</div>
+                <div class="pseudo_th">{% if order.to_date_wanted %}{{ order.to_date_wanted|date:"SHORT_DATE_FORMAT" }}{% else %}Не указана{% endif %}</div>
+            </div>
+            <div class="pseudo_tr"><div class="pseudo_td">&nbsp</div></div>
+            <div class="pseudo_tr one_col multi">
+                <div>
+                    <div class="pseudo_td">Индекс</div>
+                    <div class="pseudo_th">{{ order.to_index }}</div>
+                </div>
+                <div>
+                    <div class="pseudo_td">Страна доставки</div>
+                    <div class="pseudo_th">{{ order.to_country }}</div>
+                </div>
+                <div>
+                    <div class="pseudo_td">Город доставки</div>
+                    <div class="pseudo_th">{{ order.to_city }}</div>
+                </div>
+            </div>
+            <div class="pseudo_tr one_col">
+                <div class="pseudo_td">Адрес доставки</div>
+                <div class="pseudo_th">{{ order.to_address }}</div>
+            </div>
+            <div class="pseudo_tr"><div class="pseudo_td">&nbsp</div></div>
+            <div class="pseudo_tr one_col">
+                <div class="pseudo_td">Контакты получателя</div>
+                <div class="pseudo_th">{{ order.to_contacts|linebreaks }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="table_list">
+        <div class="pseudo_table">
+            <h3>Суммарные характеристики грузов</h3>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Вес брутто</div>
+                <div class="pseudo_th">{{ order.sum_weight|floatformat:-3 }} кг</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Объем</div>
+                <div class="pseudo_th">{{ order.sum_volume|floatformat:-3 }} м&sup3;</div>
+            </div>
+            <div class="pseudo_tr">
+                <div class="pseudo_td">Количество мест</div>
+                <div class="pseudo_th">{{ order.sum_quantity|floatformat }}</div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <h3 class="open_mark" data-target_id="#cargo_table">Детализация по грузам <img src="{% static 'img/down_quote.svg' %}" alt=""></h3>
+        <table id="cargo_table">
+            <thead>
+                <tr>
+                    <th>Маркировка</th>
+                    <th>Тип упаковки</th>
+                    <th>Габариты (Д*Ш*В), см</th>
+                    <th>Вес, кг</th>
+                    <th>Кол-во мест</th>
+                    <th>Доп. параметры</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cargo in order.cargos.all %}
+                <tr>
+                    <td>{% if cargo.mark %}{{ cargo.mark }}{% else %}-{% endif %}</td>
+                    <td>{{ cargo.package }}</td>
+                    <td>{{ cargo.length|floatformat:-2 }} * {{ cargo.width|floatformat:-2 }} * {{ cargo.height|floatformat:-2 }}</td>
+                    <td>{{ cargo.weight|floatformat:-2 }}</td>
+                    <td>{{ cargo.quantity|floatformat }}</td>
+                    <td>{% if cargo.params.exists %}{{ cargo.params.all|join:", " }}{% else %}-{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

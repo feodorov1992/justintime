@@ -277,8 +277,6 @@ class Order(AbstractModel):
     def save(
         self, force_insert=False, force_update=False, using=None, update_fields=None
     ):
-        if self.insurance_needed and not self.insurance_beneficiary:
-            self.insurance_beneficiary = self.client
         super(Order, self).save(force_insert, force_update, using, update_fields)
 
     def object_created(self, request, new_state: dict = None):
@@ -286,6 +284,8 @@ class Order(AbstractModel):
         for key, value in changes.items():
             if key.startswith('sum'):
                 self.__setattr__(key, value.get('new'))
+        if self.insurance_needed and not self.insurance_beneficiary:
+            self.insurance_beneficiary = self.client
         self.status_updated = self.created_at
         self.save()
 
@@ -308,6 +308,9 @@ class Order(AbstractModel):
                 else:
                     self.__getattribute__(key).set(new_value)
                 updated = True
+        if self.insurance_needed and not self.insurance_beneficiary:
+            self.insurance_beneficiary = self.client
+            updated = True
         if updated:
             self.save()
 

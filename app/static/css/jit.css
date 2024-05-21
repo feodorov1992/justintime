@@ -21,6 +21,10 @@ header {
     margin-bottom: 15px;
 }
 
+header a {
+    display: block;
+}
+
 .wrapper {
     width: 100%;
     max-width: 1440px;
@@ -28,7 +32,7 @@ header {
 }
 
 .header-wrapper {
-    height: 90%;
+    height: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -45,6 +49,12 @@ header {
     /*font-weight: 600;*/
     margin-left: 30px;
     text-decoration: none;
+    display: inline-block;
+}
+
+a img {
+    height: 100%;
+    width: 100%;
 }
 
 #content {
@@ -52,13 +62,18 @@ header {
 }
 
 .button {
-    padding: 15px;
+    padding: 10px;
     color: white;
     background-color: #1C477E;
     border: none;
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
+    min-width: 100px;
+}
+
+.big_button {
+    padding: 15px;
     min-width: 150px;
 }
 
@@ -96,10 +111,13 @@ a.button {
     border-color: #012F55;
 }
 
-.submenu .buttons {
+.buttons {
     display: flex;
-    min-width: 400px;
-    justify-content: space-between;
+    /*min-width: 400px;*/
+}
+
+.buttons .button {
+    margin-left: 15px;
 }
 
 .ol-content {
@@ -161,8 +179,9 @@ a.button {
     justify-content: center;
 }
 
-.filter-form input[type=date],
-.filter-form input[type=text] {
+input[type=date],
+input[type=text],
+input[type=number] {
     line-height: 28px;
     color: #444;
     display: block;
@@ -245,9 +264,212 @@ a.filter-clear {
     border-radius: 2px;
 }
 
+.order_status {
+    font-weight: 600;
+    color: #19A216;
+    cursor: pointer;
+}
+
+.order_status:hover {
+    text-decoration: underline;
+}
+
+.field_value {
+    font-weight: 600;
+}
+
+.headline {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order_number {
+    color: #1C477E;
+}
+
+.back_url {
+    width: auto;
+    display: inline-block;
+    margin: 15px 0;
+}
+
+.back_url a {
+    text-decoration: none;
+    color: black;
+    font-weight: 600;
+    display: flex;
+    width: auto;
+    white-space: nowrap;
+}
+
+.back_url img {
+    height: 1em;
+    margin-right: 10px
+}
+
+.back_url:hover {
+    text-decoration: underline;
+}
+
+.table_list {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.pseudo_table {
+    width: calc(50% - 20px);
+}
+
+.pseudo_tr {
+    display: flex;
+    margin-bottom: 10px
+}
+
+.pseudo_tr.one_col {
+    display: block;
+}
+
+.pseudo_th {
+    font-weight: 600;
+}
+
+.pseudo_td {}
+
+.pseudo_tr>*:first-child {
+    width: 40%;
+    margin-left: 0 !important;
+}
+
+.pseudo_tr>*:nth-child(3) {
+    margin-left: 15px;
+}
+
+.pseudo_tr.one_col>* {
+    width: auto !important;
+    margin-left: 0;
+    margin-bottom: 10px;
+}
+
+.pseudo_tr.multi {
+    display: flex;
+}
+
+.pseudo_tr.multi>* {
+    margin-right: 50px;
+}
+
+.light_blue {
+    background: #E8F1FD;
+    padding: 20px;
+    width: calc(100% - 40px);
+    border-radius: 8px;
+}
+
+ul.no_bullets {
+    list-style-type: none;
+    margin-block-start: 0;
+    padding-inline-start: 0;
+}
+
+ul.no_bullets li {
+    margin-bottom: 10px;
+}
+
+.open_mark {
+    cursor: pointer;
+}
+
+.open_mark:hover {
+    text-decoration: underline;
+}
+
+.open_mark.opened img {
+    transform: rotate(180deg);
+}
+
+table#cargo_table {
+    width: 100%;
+    display: none;
+}
+
+table#cargo_table,
+table#cargo_table tr,
+table#cargo_table th,
+table#cargo_table td {
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+table#cargo_table thead tr {
+    background-color: #1C477E;
+    color: white;
+}
+
+table#cargo_table thead th {
+    text-align: start !important;
+}
+
+table#cargo_table tbody tr:nth-child(2n+1) {
+    background-color: #E8F1FD;
+}
+
+table#cargo_table tbody tr:nth-child(2n) {
+    background-color: #D1E4FC;
+}
+
+table#cargo_table th,
+table#cargo_table td {
+    height: 45px;
+    padding-left: 15px;
+}
+
 footer {
     height: 50px;
     margin-top: 15px;
     background: url("/static/img/footer.svg") repeat-x center, linear-gradient(90deg, #103055 0%, #1C477E 100%);
     flex-shrink: 0;
 }
+
+#alert {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    width: 100vw;
+    height: 100vh;
+    background-color: #1C477E52;
+}
+
+#alert>div {
+    display: flex;
+}
+
+#alert_label {
+    background: white;
+    padding: 50px;
+    min-width: 250px;
+    min-height: 150px;
+}
+
+#cross{
+    height: 20px;
+    width: 20px;
+    margin-top: 10px;
+    margin-left: -30px;
+    cursor: pointer;
+}
+
+#cross img {
+    width: 100%;
+    height: 100%;
+}
+
+/*#cross svg:hover {*/
+/*    background-color: black;*/
+/*    stroke: white;*/
+/*    cursor: pointer;*/
+/*}*/
