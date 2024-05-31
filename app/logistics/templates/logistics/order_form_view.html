@@ -1,0 +1,29 @@
+{% extends 'logistics/base.html' %}
+{% block title %}{% block tab_title %}{% endblock %}{% endblock %}
+{% block content %}
+    <h1>{% block page_title %}{% endblock %}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_my_style }}
+        <div id="cargo_formset">
+            <h3>Грузы</h3>
+            {{ formset.management_form }}
+            {{ formset.non_form_errors }}
+            <div class="container">
+                {% for form in formset.forms %}
+                    {{ form.as_my_style }}
+                {% endfor %}
+            </div>
+        </div>
+        <div id="add_cargo">
+            <p>Добавить груз</p>
+        </div>
+        <div id="form_submit">
+            <a class="gray_link" href="{% if request.META.HTTP_REFERER and request.META.HTTP_REFERER != request.build_absolute_uri %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'orders_list' %}{% endif %}">Отмена</a>
+            <input class="button big_button" type="submit" value="Отправить заявку">
+        </div>
+    </form>
+    <script>
+        const cargoFormTemplate = '{{ formset.empty_form.as_my_style|escapejs }}'
+    </script>
+{% endblock %}

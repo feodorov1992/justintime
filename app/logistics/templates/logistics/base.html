@@ -27,8 +27,8 @@
                 <a href="/"><img src="{% static 'img/logo.svg' %}" alt="logo"></a>
             </div>
             <div class="menu">
-                <a href="">Лента заявок</a>
-                <a href="">Создать заявку</a>
+                <a href="{% url 'orders_list' %}">Лента заявок</a>
+                <a href="{% url 'order_create' %}">Создать заявку</a>
                 <a href="">Быстрая заявка</a>
                 <a href=""><img src="{% static 'img/profile.svg' %}" alt="profile"></a>
             </div>

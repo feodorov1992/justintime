@@ -1,45 +1,122 @@
 from django import forms
+from django.forms import ModelForm, formset_factory, inlineformset_factory
 from django_genericfilters import forms as gf
 from django_select2.forms import ModelSelect2Widget
 
 from app_auth.models import User
-from logistics.models import ORDER_STATUS_LABELS
+from logistics.filtersets import ClientWidget, ManagerWidget, MySelect2Widget
+from logistics.models import ORDER_STATUS_LABELS, Order, Cargo
 from orgs.models import Organisation
 
 
-class ClientWidget(ModelSelect2Widget):
-    search_field_names = 'name', 'legal_name', 'inn', 'kpp', 'ogrn'
-    search_fields = {f'{field_name}__icontains' for field_name in search_field_names}
+class ContractWidget(MySelect2Widget):
+    search_field_names = 'number',
+    dependent_fields = {'client': 'organization'}
 
     def filter_queryset(self, request, term, queryset=None, **dependent_fields):
-        return super(ClientWidget, self).filter_queryset(request, term, queryset, **dependent_fields)
-
-    def get_queryset(self):
-        qs = super(ClientWidget, self).get_queryset()
-        return qs.filter(is_client=True)
-
-
-class ManagerWidget(ModelSelect2Widget):
-    search_field_names = 'username', 'first_name', 'last_name', 'email'
-    search_fields = {f'{field_name}__icontains' for field_name in search_field_names}
-
-    def get_queryset(self):
-        qs = super(ManagerWidget, self).get_queryset()
-        return qs.filter(organization__is_expeditor=True).select_related('organization')
+        if not request.user.is_staff:
+            dependent_fields['organization'] = request.user.organization.id
+        elif not dependent_fields:
+            dependent_fields['organization'] = None
+        return super(ContractWidget, self).filter_queryset(request, term, queryset, **dependent_fields)
 
 
-class OrderListFilters(gf.FilteredForm):
-    query = forms.CharField(label='Поиск', required=False)
+class CountryWidget(MySelect2Widget):
+    search_field_names = 'name',
 
-    status = gf.ChoiceField(choices=ORDER_STATUS_LABELS, label='Статус', required=False)
-    client = forms.ModelChoiceField(label='Заказчик', required=False, empty_label=None,
-                                    queryset=Organisation.objects.all(), widget=ClientWidget)
-    manager = forms.ModelChoiceField(queryset=User.objects.all(),
-                                     label='Менеджер', required=False, empty_label=None, widget=ManagerWidget)
-    date__gte = forms.DateField(label='Не ранее', required=False, widget=forms.DateInput(attrs={'type': 'date'},
-                                                                                         format='%Y-%m-%d'))
-    date__lte = forms.DateField(label='Не позднее', required=False, widget=forms.DateInput(attrs={'type': 'date'},
-                                                                                           format='%Y-%m-%d'))
 
-    def get_order_by_choices(self):
-        return list()
+class CityWidget(MySelect2Widget):
+    search_field_names = 'name',
+
+    def filter_queryset(self, request, term, queryset=None, **dependent_fields):
+        if not dependent_fields and self.dependent_fields:
+            dependent_fields = {key: None for key in self.dependent_fields.values()}
+        return super().filter_queryset(request, term, queryset, **dependent_fields)
+
+
+class FromCityWidget(CityWidget):
+    dependent_fields = {'from_country': 'country'}
+
+
+class ToCityWidget(CityWidget):
+    dependent_fields = {'to_country': 'country'}
+
+
+class CounterpartyWidget(MySelect2Widget):
+    search_field_names = 'name',
+
+
+class PackageWidget(MySelect2Widget):
+    search_field_names = 'name',
+
+
+class OrderForm(ModelForm):
+    required_css_class = 'required'
+    
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user')
+        super(OrderForm, self).__init__(*args, **kwargs)
+        if user is not None and not user.is_staff:
+            del self.fields['client']
+        self.label_suffix = None
+        for field_name in self.fields:
+            if 'currency' in field_name:
+                self.fields[field_name].label_from_instance = self.label_from_instance
+
+    @staticmethod
+    def label_from_instance(obj):
+        return obj.displayed_name
+
+    def as_my_style(self):
+        context = super().get_context()
+        context['fields'] = {f_e[0].name: f_e[0] for f_e in context['fields']}
+        context['hidden_fields'] = {f_e.name: f_e for f_e in context['hidden_fields']}
+        return self.render('logistics/forms/order.html', context=context)
+
+    class Meta:
+        model = Order
+        fields = ('client_number', 'date', 'client', 'contract', 'cargo_name', 'cargo_value', 'cargo_value_currency',
+                  'insurance_needed', 'cargo_origin', 'gov_contract_number', 'services', 'comment', 'from_org',
+                  'from_date_wanted', 'from_contacts', 'from_index', 'from_country', 'from_city', 'from_address',
+                  'from_label', 'to_org', 'to_date_wanted', 'to_contacts', 'to_index', 'to_country', 'to_city',
+                  'to_address', 'to_label')
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+            'services': forms.CheckboxSelectMultiple(attrs={'class': 'checkboxes'}),
+            'client': ClientWidget,
+            'contract': ContractWidget,
+            'cargo_origin': CountryWidget,
+            'from_org': CounterpartyWidget,
+            'from_date_wanted': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+            'from_country': CountryWidget,
+            'from_city': FromCityWidget,
+            'to_org': CounterpartyWidget,
+            'to_date_wanted': forms.DateInput(attrs={'type': 'date'}, format='%Y-%m-%d'),
+            'to_country': CountryWidget,
+            'to_city': ToCityWidget,
+        }
+
+
+class CargoForm(ModelForm):
+    required_css_class = 'required'
+
+    def __init__(self, *args, **kwargs):
+        super(CargoForm, self).__init__(*args, **kwargs)
+        self.label_suffix = None
+
+    def as_my_style(self):
+        context = super().get_context()
+        context['fields'] = {f_e[0].name: f_e[0] for f_e in context['fields']}
+        context['hidden_fields'] = {f_e.name: f_e for f_e in context['hidden_fields']}
+        return self.render('logistics/forms/cargo.html', context=context)
+
+    class Meta:
+        model = Cargo
+        fields = '__all__'
+        widgets = {
+            'params': forms.CheckboxSelectMultiple(attrs={'class': 'checkboxes'}),
+            'package': PackageWidget
+        }
+
+
+CargoFormset = inlineformset_factory(Order, Cargo, form=CargoForm, extra=0, min_num=1, validate_min=True)

@@ -7,7 +7,7 @@
             <a href="">Лента быстрых заявок</a>
         </div>
         <div class="buttons">
-            <a href="" class="button big_button">Создать заявку</a>
+            <a href="{% url 'order_create' %}" class="button big_button">Создать заявку</a>
             <a href="" class="button big_button">Быстрая заявка</a>
         </div>
     </div>
@@ -118,8 +118,8 @@
                             <a href="{% url 'order_detail' pk=obj.pk %}">Подробный просмотр</a>
                         </div>
                         <div class="links-group">
-                            <a href="">Изменить</a>
-                            <a href="">Скопировать</a>
+                            <a href="{% url 'order_update' pk=obj.pk %}">Изменить</a>
+                            <a href="{% url 'order_create' %}?copy={{ obj.pk }}">Скопировать</a>
                         </div>
                     </div>
                 </div>

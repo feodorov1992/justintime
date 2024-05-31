@@ -3,6 +3,7 @@ from typing import Union
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import QuerySet
 from django.template.defaultfilters import floatformat
@@ -326,11 +327,11 @@ class Order(AbstractModel):
 class Cargo(AbstractModel):
     mark = models.CharField(max_length=255, blank=True, null=True, verbose_name='Маркировка')
     package = models.ForeignKey(Package, on_delete=models.PROTECT, verbose_name='Тип упаковки')
-    length = models.FloatField(verbose_name='Длина, см')
-    width = models.FloatField(verbose_name='Ширина, см')
-    height = models.FloatField(verbose_name='Высота, см')
-    weight = models.FloatField(verbose_name='Вес, кг')
-    quantity = models.IntegerField(verbose_name='Кол-во мест')
+    length = models.FloatField(verbose_name='Длина, см', validators=[MinValueValidator(0)])
+    width = models.FloatField(verbose_name='Ширина, см', validators=[MinValueValidator(0)])
+    height = models.FloatField(verbose_name='Высота, см', validators=[MinValueValidator(0)])
+    weight = models.FloatField(verbose_name='Вес, кг', validators=[MinValueValidator(0)])
+    quantity = models.IntegerField(verbose_name='Кол-во мест', validators=[MinValueValidator(0)])
     params = models.ManyToManyField(CargoParam, verbose_name='Доп. параметры груза', blank=True)
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='cargos', verbose_name='Заявка')
 

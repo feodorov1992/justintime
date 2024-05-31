@@ -21,3 +21,38 @@ $('.open_mark').click(function () {
         target.show()
     }
 })
+
+
+function addForm(template, target) {
+    let totalFormsInput = target.find('input[id*="TOTAL_FORMS"]')
+    let totalForms = totalFormsInput.val()
+    let newForm = template.replaceAll(/__prefix__/g, totalForms)
+    let container = target.find('.container').last()
+    container.append(newForm)
+    $('body').find('.django-select2').djangoSelect2()
+    totalForms++
+    totalFormsInput.val(totalForms)
+}
+
+$('#add_cargo').click(function () {
+    addForm(cargoFormTemplate, $('#cargo_formset'))
+})
+
+function removeForm(elem) {
+    let elemID = elem.find('.hidden_fields input').first().val()
+    if (!elemID) {
+        let totalFormsInput = elem.parents('div[id*="formset"]').first().find('input[id*="TOTAL_FORMS"]')
+        let totalForms = totalFormsInput.val()
+        totalForms--
+        totalFormsInput.val(totalForms)
+        elem.remove()
+    } else {
+        let deleteInput = elem.find('.hidden_fields input[id*="DELETE"]')
+        deleteInput.prop('checked')
+        elem.hide()
+    }
+}
+
+$('body').on('click', '.del_btn', function () {
+    removeForm($(this).parents('.cargo_form').last())
+})

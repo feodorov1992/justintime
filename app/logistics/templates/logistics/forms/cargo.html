@@ -1,0 +1,71 @@
+<div class="cargo_form">
+    <div class="hidden_fields">
+        {{ hidden_fields.id }}
+        {{ hidden_fields.order }}
+        {{ fields.DELETE }}
+    </div>
+    <div class="gray_plate">
+        <div class="form-row">
+            <div>
+                <div class="form-field">
+                    {{ fields.mark.label_tag }}
+                    {{ fields.mark }}
+                    {% if fields.mark.errors %}{{ fields.mark.errors }}{% else %}&nbsp;{% endif %}
+                </div>
+            </div>
+            <div>
+                <div class="form-field">
+                    {{ fields.package.label_tag }}
+                    {{ fields.package }}
+                    {% if fields.package.errors %}{{ fields.package.errors }}{% else %}&nbsp;{% endif %}
+                </div>
+            </div>
+            <div>
+                <span class="pseudo_label required">Габариты (Д*Ш*В), см</span>
+                <div class="cargo-size">
+                    <div class="form-field">
+                        {{ fields.length }}
+                    </div>
+                    <div class="form-field">
+                        {{ fields.width }}
+                    </div>
+                    <div class="form-field">
+                        {{ fields.height }}
+                    </div>
+                </div>
+                {{ fields.length.errors }}
+                {{ fields.width.errors }}
+                {{ fields.height.errors }}
+{#                <div class="errorlist">#}
+{#                    {% if fields.length.errors or fields.width.errors or fields.height.errors %}#}
+{#                        Обязательное поле.#}
+{#                    {% else %}#}
+{#                        &nbsp;#}
+{#                    {% endif %}#}
+{#                </div>#}
+            </div>
+            <div class="cargo-size">
+                <div class="form-field">
+                    {{ fields.weight.label_tag }}
+                    {{ fields.weight }}
+                    {% if fields.weight.errors %}{{ fields.weight.errors }}{% else %}&nbsp;{% endif %}
+                </div>
+                <div class="form-field">
+                    {{ fields.quantity.label_tag }}
+                    {{ fields.quantity }}
+                    {% if fields.quantity.errors %}{{ fields.quantity.errors }}{% else %}&nbsp;{% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-field">
+                <b>{{ fields.params.label_tag }}</b>
+                {{ fields.params }}
+                {% if fields.params.errors %}{{ fields.params.errors }}{% else %}&nbsp;{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="del_btn">{% load static %}
+        <img src="{% static 'img/trash.svg' %}" alt="">
+    </div>
+</div>

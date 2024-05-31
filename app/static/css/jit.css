@@ -179,7 +179,10 @@ a.button {
     justify-content: center;
 }
 
+select,
+textarea,
 input[type=date],
+input[type=password],
 input[type=text],
 input[type=number] {
     line-height: 28px;
@@ -191,7 +194,29 @@ input[type=number] {
     white-space: nowrap;
     background-color: #fff;
     border: 1px solid #aaa;
-    border-radius: 4px;
+    border-radius: 8px;
+}
+
+textarea {
+    line-height: normal !important;
+    resize: vertical;
+}
+
+select {
+    height: 32px;
+}
+
+input[type=checkbox] {
+    width: auto !important;
+}
+
+.select2-container--default .select2-selection--single {
+    border-radius: 8px !important;
+    height: 32px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    top: 3px !important;
 }
 
 a.filter-clear {
@@ -466,6 +491,187 @@ footer {
 #cross img {
     width: 100%;
     height: 100%;
+}
+
+form .gray_plate {
+    background: #F0F0F0;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.form-2cols {
+    display: flex;
+    justify-content: space-between;
+}
+
+.form-col {
+    width: 50%;
+}
+
+.form-row {
+    width: 100%;
+    display: flex;
+    /*justify-content: space-between;*/
+}
+
+.form-row>div {
+    height: auto !important;
+}
+
+.form-row.center {
+    align-items: center;
+}
+
+.form-field {
+    width: 100%;
+}
+
+.pseudo_label,
+.form-field label {
+    font-size: 14px;
+}
+
+.form-field input[type=text],
+.form-field input[type=number] {
+    width: calc(100% - 25px);
+    margin-right: 10px;
+}
+
+.form-field .select2-container {
+    width: calc(100% - 13px) !important;
+    margin-right: 10px;
+}
+
+.form-field textarea {
+    width: calc(100% - 25px);
+    margin-right: 10px;
+}
+
+.contacts textarea {
+    resize: none;
+    height: 100px;
+}
+
+.mth {
+    width: 60%;
+}
+
+.lth {
+    width: 40%;
+}
+
+.required::after {
+    content: '*';
+    color: red;
+    font-weight: 600;
+}
+
+.price_field {
+    display: flex;
+}
+
+.price_field input {
+    margin-right: 5px;
+}
+
+.checkboxes {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.checkboxes>div,
+.checkbox {
+    display: flex;
+    align-items: center;
+}
+
+.checkboxes>div input {
+    margin: 0 3px 0 0;
+}
+
+.checkbox input {
+    margin-right: 3px;
+    margin-left: 15px
+}
+
+.checkboxes>div label {
+    display: flex;
+    white-space: nowrap;
+    align-items: center;
+    margin-right: 15px;
+}
+
+.cargo_form {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.cargo_form>.gray_plate {
+    width: calc(100% - 50px);
+}
+
+.cargo_form .form-row>div {
+    width: calc(25% - 10px) !important;
+    margin-right: 10px;
+}
+
+.cargo-size {
+    display: flex;
+    justify-content: space-between;
+}
+
+.cargo_form .del_btn {
+    height: 150px !important;
+    width: 40px;
+    padding: 0 5px;
+    background: #F2D4D4;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#add_cargo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #D1E4FC;
+    border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+
+#form_submit {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    height: 60px;
+    margin: 15px 0;
+}
+
+#form_submit>* {
+    margin-left: 25px;
+}
+
+.gray_link {
+    color: #848484;
+}
+
+.hidden_fields {
+    display: none;
+}
+
+.errorlist {
+    color: red;
+    font-size: 14px;
+}
+
+.errorfield {
+    border-color: red
 }
 
 /*#cross svg:hover {*/

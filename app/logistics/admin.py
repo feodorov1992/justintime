@@ -226,12 +226,6 @@ class OrderAdmin(admin.ModelAdmin):
         data['manager'] = request.user
         return data
 
-    def render_change_form(
-        self, request, context, add=False, change=False, form_url="", obj=None
-    ):
-        print(context.get('adminform').form.initial)
-        return super(OrderAdmin, self).render_change_form(request, context, add, change, form_url, obj)
-
     def changelist_view(self, request, extra_context=None):
         if request.POST.get('action', '') in self.act_on_filtered:
             if not request.POST.getlist(ACTION_CHECKBOX_NAME):

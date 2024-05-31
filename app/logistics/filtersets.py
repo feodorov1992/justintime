@@ -9,19 +9,26 @@ from logistics.models import Order, ORDER_STATUS_LABELS
 from orgs.models import Organisation
 
 
-class ClientWidget(ModelSelect2Widget):
-    search_field_names = 'name', 'legal_name', 'inn', 'kpp', 'ogrn'
-    search_fields = {f'{field_name}__icontains' for field_name in search_field_names}
+class MySelect2Widget(ModelSelect2Widget):
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.search_fields = {f'{field_name}__icontains' for field_name in self.search_field_names}
+        self.attrs = {
+            "data-minimum-input-length": 0
+        }
+
+
+class ClientWidget(MySelect2Widget):
+    search_field_names = 'name', 'legal_name', 'inn', 'kpp', 'ogrn'
 
     def get_queryset(self):
         qs = super(ClientWidget, self).get_queryset()
         return qs.filter(is_client=True)
 
 
-class ManagerWidget(ModelSelect2Widget):
+class ManagerWidget(MySelect2Widget):
     search_field_names = 'username', 'first_name', 'last_name', 'email'
-    search_fields = {f'{field_name}__icontains' for field_name in search_field_names}
 
     def get_queryset(self):
         qs = super(ManagerWidget, self).get_queryset()

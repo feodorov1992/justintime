@@ -8,8 +8,8 @@
         <div>Статус: <span onclick="getModalView('{% url 'order_status' pk=order.pk %}')" class="order_status {{ order.status }}">{{ order.get_status_display }}</span></div>
         <div class="buttons">
             {% if order.tracking_url %}<a class="button" href="{{ order.tracking_url }}" target="_blank">Отследить</a>{% endif %}
-            <a class="button" href="">Изменить</a>
-            <a class="button" href="">Скопировать</a>
+            <a class="button" href="{% url 'order_update' pk=order.pk %}">Изменить</a>
+            <a class="button" href="{% url 'order_create' %}?copy={{ order.pk }}">Скопировать</a>
         </div>
     </div>
     <div class="table_list light_blue">
