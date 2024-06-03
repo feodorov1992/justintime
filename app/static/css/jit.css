@@ -617,6 +617,10 @@ form .gray_plate {
     margin-right: 10px;
 }
 
+.cargo_form .form-field.wide {
+    width: 100% !important;
+}
+
 .cargo-size {
     display: flex;
     justify-content: space-between;
