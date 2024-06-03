@@ -128,7 +128,7 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = 'sum_weight', 'sum_volume', 'sum_quantity', 'status_updated'
     inlines = CargoInline, OrderStatusInline, DocsInline
     list_display = ('number', 'date', 'client_number', 'client', 'from_address_short', 'to_address_short',
-                    'status_short', 'full_price',)
+                    'status', 'full_price',)
     list_filter = ClientFilter, ManagerFilter, ClientEmployeeFilter, ('date', DateRangeFilterBuilder()), StatusFilter
     old_state = None
     change_form_template = 'admin/order_change.html'

@@ -1,11 +1,12 @@
 Django
-psycopg2
-uWSGI
 Pillow
 xlwt
 celery
 redis
+django-redis
 django-filter
+django-generic-filters
 django-admin-autocomplete-all
+django-admin-autocomplete-filter
 django-admin-rangefilter
 django-select2

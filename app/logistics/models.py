@@ -188,11 +188,6 @@ class Order(AbstractModel):
         if errors:
             raise ValidationError(errors)
 
-    def status_short(self):
-        return self.orderstatus_set.first().get_name_display()
-
-    status_short.short_description = 'Статус'
-
     def get_field_choices(self, field_name):
         fields = {field.name: field for field in self._meta.fields}
         field = fields.get(field_name)

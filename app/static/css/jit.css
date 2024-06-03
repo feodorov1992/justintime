@@ -674,6 +674,14 @@ form .gray_plate {
     border-color: red
 }
 
+.small_form {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 /*#cross svg:hover {*/
 /*    background-color: black;*/
 /*    stroke: white;*/

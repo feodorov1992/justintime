@@ -2,6 +2,7 @@ import logging
 from typing import Type
 
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Model
 from django.forms import Form, BaseFormSet, ModelForm, formset_factory
 from django.shortcuts import render, redirect
@@ -12,6 +13,7 @@ from django_filters import FilterSet
 from django_filters.views import FilterView
 from django_genericfilters.views import FilteredListView
 
+from logistics.filtersets import OrderFilterSet
 from logistics.forms import OrderForm, CargoFormset
 from logistics.models import Order
 
@@ -19,21 +21,30 @@ from logistics.models import Order
 logger = logging.getLogger(__name__)
 
 
-class OrderDetailView(DetailView):
+class OrderListView(LoginRequiredMixin, FilterView):
+    filterset_class = OrderFilterSet
+    paginate_by = 5
+    login_url = 'login'
+
+
+class OrderDetailView(LoginRequiredMixin, DetailView):
     model = Order
     template_name = 'logistics/order_detail.html'
+    login_url = 'login'
 
 
-class OrderStatusView(DetailView):
+class OrderStatusView(LoginRequiredMixin, DetailView):
     model = Order
     template_name = 'logistics/order_status.html'
+    login_url = 'login'
 
 
-class OrderCreateView(View):
+class OrderCreateView(LoginRequiredMixin, View):
     model = Order
     template_name: str = 'logistics/order_create.html'
     form_class: Type[Form] = OrderForm
     formset_class: Type[BaseFormSet] = CargoFormset
+    login_url = 'login'
 
     def get(self, request):
         copy_id = request.GET.get('copy')
@@ -68,11 +79,12 @@ class OrderCreateView(View):
         return render(request, self.template_name, {'form': form, 'formset': formset})
 
 
-class OrderUpdateView(View):
+class OrderUpdateView(LoginRequiredMixin, View):
     model = Order
     template_name: str = 'logistics/order_update.html'
     form_class: Type[Form] = OrderForm
     formset_class: Type[BaseFormSet] = CargoFormset
+    login_url = 'login'
 
     def __init__(self, *args, **kwargs):
         super(OrderUpdateView, self).__init__(*args, **kwargs)
