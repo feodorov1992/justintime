@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Just In Time | {% block title %}{% endblock %}</title>
+    {% load static %}
+    <link href="{% static 'css/jit.css' %}" media="screen" rel="stylesheet">
+    <link href="{% static 'admin/css/vendor/select2/select2.min.css' %}" media="screen" rel="stylesheet">
+    <link href="{% static 'django_select2/django_select2.css' %}" media="screen" rel="stylesheet">
+</head>
+<body>
+<div class="popup_content">
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

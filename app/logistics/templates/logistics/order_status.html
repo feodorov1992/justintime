@@ -1,12 +1,18 @@
 {% load i18n %}
 <h1>Статус заявки № <span class="order_number">{{ order.number }}</span></h1>
 <div style="text-align: left">
-    <p><b>Текущий статус:</b> {{ order.get_status_display }}</p>
-    <p><b>История статусов:</b></p>
-    <ul>
-        {% for status in order.orderstatus_set.all %}
-        <li>{{ status }}</li>
-        {% endfor %}
-    </ul>
-    {% if order.tracking_url %}<p><a target="_blank" href="{{ order.tracking_url }}">Отследить груз</a></p>{% endif %}
+    <p><b>Текущий статус:</b> <span class="order_status">{{ order.get_status_display }}</span></p>
+    {% if order.orderstatus_set.exists %}
+        <p><b>История статусов:</b></p>
+        <ul class="status_list">
+            {% for status in order.orderstatus_set.all %}
+            <li>
+                <span class="status_item"><b>{{ status.change_time|date:"SHORT_DATE_FORMAT" }}</b></span>
+                <span class="status_item">{{ status.change_time|time:"H:i:s" }}</span>
+                <span class="status_item">{{ status.get_name_display }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% if order.tracking_url %}<p><a class="button" target="_blank" href="{{ order.tracking_url }}">Отследить груз</a></p>{% endif %}
 </div>

@@ -184,6 +184,7 @@ textarea,
 input[type=date],
 input[type=password],
 input[type=text],
+input[type=email],
 input[type=number] {
     line-height: 28px;
     color: #444;
@@ -560,7 +561,7 @@ form .gray_plate {
     width: 40%;
 }
 
-.required::after {
+label.required::after {
     content: '*';
     color: red;
     font-weight: 600;
@@ -619,6 +620,14 @@ form .gray_plate {
 
 .cargo_form .form-field.wide {
     width: 100% !important;
+}
+
+ul.status_list {
+    list-style-type: none;
+}
+
+.status_item {
+    margin-right: 15px;
 }
 
 .cargo-size {
@@ -684,6 +693,41 @@ form .gray_plate {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.popup_content {
+    margin-left: 25px;
+    margin-bottom: 25px;
+}
+
+.popup_content form {
+    width: 400px;
+}
+
+.popup_content form>div {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.popup_content form input {
+    width: 100%;
+}
+
+.editable_field {
+    display: flex;
+    align-items: center;
+}
+
+.related-widget-wrapper-link {
+    display: flex;
+    height: 15px;
+    width: 15px;
+    margin-left: 5px
+}
+
+.editable_field img {
+    height: 100%;
+    width: 100%;
 }
 
 /*#cross svg:hover {*/

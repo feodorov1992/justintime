@@ -1,4 +1,4 @@
-<div id="order_form">
+<div id="order_form">{% load static %}
     <div class="gray_plate form-2cols">
         <div class="form-col">
             <div class="form-row">
@@ -82,9 +82,9 @@
         <div class="form-col">
             <h3>Пункт отправки</h3>
             <div class="form-row">
-                <div class="lth">
+                <div class="mth">
                     <div class="form-field">
-                        {{ fields.from_org.label_tag }}
+                        <div class="editable_field">{{ fields.from_org.label_tag }}<a class="related-widget-wrapper-link add-related" id="add_id_from_org" data-popup="yes" href="{% url 'org_add' %}?_to_field=id&amp;_popup=1"><img src="{% static 'admin/img/icon-addlink.svg' %}" alt="Добавить"></a></div>
                         {{ fields.from_org }}
                         {% if fields.from_org.errors %}{{ fields.from_org.errors }}{% else %}&nbsp;{% endif %}
                     </div>
@@ -94,7 +94,7 @@
                         {% if fields.from_date_wanted.errors %}{{ fields.from_date_wanted.errors }}{% else %}&nbsp;{% endif %}
                     </div>
                 </div>
-                <div class="mth">
+                <div class="lth">
                     <div class="form-field contacts">
                         {{ fields.from_contacts.label_tag }}
                         {{ fields.from_contacts }}
@@ -112,14 +112,14 @@
                 </div>
                 <div class="lth">
                     <div class="form-field">
-                        {{ fields.from_country.label_tag }}
+                        <div class="editable_field">{{ fields.from_country.label_tag }}<a class="related-widget-wrapper-link add-related" id="add_id_from_country" data-popup="yes" href="{% url 'country_add' %}?_to_field=id&amp;_popup=1"><img src="{% static 'admin/img/icon-addlink.svg' %}" alt="Добавить"></a></div>
                         {{ fields.from_country }}
                         {% if fields.from_country.errors %}{{ fields.from_country.errors }}{% else %}&nbsp;{% endif %}
                     </div>
                 </div>
                 <div class="lth">
                     <div class="form-field">
-                        {{ fields.from_city.label_tag }}
+                        <div class="editable_field">{{ fields.from_city.label_tag }}<a class="related-widget-wrapper-link add-related" id="add_id_from_city" data-popup="yes" href="{% url 'city_add' %}?_to_field=id&amp;_popup=1"><img src="{% static 'admin/img/icon-addlink.svg' %}" alt="Добавить"></a></div>
                         {{ fields.from_city }}
                         {% if fields.from_city.errors %}{{ fields.from_city.errors }}{% else %}&nbsp;{% endif %}
                     </div>
@@ -145,9 +145,9 @@
         <div class="form-col">
             <h3>Пункт доставки</h3>
             <div class="form-row">
-                <div class="lth">
+                <div class="mth">
                     <div class="form-field">
-                        {{ fields.to_org.label_tag }}
+                        <div class="editable_field">{{ fields.to_org.label_tag }}<a class="related-widget-wrapper-link add-related" id="add_id_to_org" data-popup="yes" href="{% url 'org_add' %}?_to_field=id&amp;_popup=1"><img src="{% static 'admin/img/icon-addlink.svg' %}" alt="Добавить"></a></div>
                         {{ fields.to_org }}
                         {% if fields.to_org.errors %}{{ fields.to_org.errors }}{% else %}&nbsp;{% endif %}
                     </div>
@@ -157,7 +157,7 @@
                         {% if fields.to_date_wanted.errors %}{{ fields.to_date_wanted.errors }}{% else %}&nbsp;{% endif %}
                     </div>
                 </div>
-                <div class="mth">
+                <div class="lth">
                     <div class="form-field contacts">
                         {{ fields.to_contacts.label_tag }}
                         {{ fields.to_contacts }}
@@ -175,14 +175,14 @@
                 </div>
                 <div class="lth">
                     <div class="form-field">
-                        {{ fields.to_country.label_tag }}
+                        <div class="editable_field">{{ fields.to_country.label_tag }}<a class="related-widget-wrapper-link add-related" id="add_id_to_country" data-popup="yes" href="{% url 'country_add' %}?_to_field=id&amp;_popup=1"><img src="{% static 'admin/img/icon-addlink.svg' %}" alt="Добавить"></a></div>
                         {{ fields.to_country }}
                         {% if fields.to_country.errors %}{{ fields.to_country.errors }}{% else %}&nbsp;{% endif %}
                     </div>
                 </div>
                 <div class="lth">
                     <div class="form-field">
-                        {{ fields.to_city.label_tag }}
+                        <div class="editable_field">{{ fields.to_city.label_tag }}<a class="related-widget-wrapper-link add-related" id="add_id_to_city" data-popup="yes" href="{% url 'city_add' %}?_to_field=id&amp;_popup=1"><img src="{% static 'admin/img/icon-addlink.svg' %}" alt="Добавить"></a></div>
                         {{ fields.to_city }}
                         {% if fields.to_city.errors %}{{ fields.to_city.errors }}{% else %}&nbsp;{% endif %}
                     </div>
