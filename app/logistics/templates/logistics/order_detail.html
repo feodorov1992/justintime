@@ -109,6 +109,20 @@
                 <div class="pseudo_th">{% if order.from_date_wanted %}{{ order.from_date_wanted|date:"SHORT_DATE_FORMAT" }}{% else %}Не указана{% endif %}</div>
             </div>
             <div class="pseudo_tr"><div class="pseudo_td">&nbsp</div></div>
+            <div class="pseudo_tr one_col">
+                <div class="pseudo_td">Дата отправки груза</div>
+            </div>
+            <div class="pseudo_tr">
+                <div>
+                    <div class="pseudo_td">План</div>
+                    <div class="pseudo_th">{% if order.from_date_plan %}{{ order.from_date_plan|date:"SHORT_DATE_FORMAT" }}{% else %}Не указана{% endif %}</div>
+                </div>
+                <div>
+                    <div class="pseudo_td">Факт</div>
+                    <div class="pseudo_th">{% if order.from_date_fact %}{{ order.from_date_fact|date:"SHORT_DATE_FORMAT" }}{% else %}Не указана{% endif %}</div>
+                </div>
+            </div>
+            <div class="pseudo_tr"><div class="pseudo_td">&nbsp</div></div>
             <div class="pseudo_tr one_col multi">
                 <div>
                     <div class="pseudo_td">Индекс</div>
@@ -142,6 +156,20 @@
             <div class="pseudo_tr">
                 <div class="pseudo_td">Желаемая дата доставки</div>
                 <div class="pseudo_th">{% if order.to_date_wanted %}{{ order.to_date_wanted|date:"SHORT_DATE_FORMAT" }}{% else %}Не указана{% endif %}</div>
+            </div>
+            <div class="pseudo_tr"><div class="pseudo_td">&nbsp</div></div>
+            <div class="pseudo_tr one_col">
+                <div class="pseudo_td">Дата доставки груза</div>
+            </div>
+            <div class="pseudo_tr">
+                <div>
+                    <div class="pseudo_td">План</div>
+                    <div class="pseudo_th">{% if order.to_date_plan %}{{ order.to_date_plan|date:"SHORT_DATE_FORMAT" }}{% else %}Не указана{% endif %}</div>
+                </div>
+                <div>
+                    <div class="pseudo_td">Факт</div>
+                    <div class="pseudo_th">{% if order.to_date_fact %}{{ order.to_date_fact|date:"SHORT_DATE_FORMAT" }}{% else %}Не указана{% endif %}</div>
+                </div>
             </div>
             <div class="pseudo_tr"><div class="pseudo_td">&nbsp</div></div>
             <div class="pseudo_tr one_col multi">
