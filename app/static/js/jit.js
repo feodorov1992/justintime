@@ -1,3 +1,6 @@
+const $ = django.jQuery;
+const jQuery = django.jQuery;
+
 $('#cross').click( function(){
     $('#alert').removeAttr('style');
     $('#alert_label').html(null);
