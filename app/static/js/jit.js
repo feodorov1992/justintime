@@ -1,6 +1,14 @@
 const $ = django.jQuery;
 const jQuery = django.jQuery;
 
+$('#hidden_menu').click(function(event) {
+    event.stopPropagation();
+});
+
+$('#alert').click(function(event) {
+    event.stopPropagation();
+});
+
 $( "#profile_img" ).click(function(event) {
     event.stopPropagation();
     let hiddenMenu = $('#hidden_menu')
@@ -21,9 +29,11 @@ $( "#profile_img" ).click(function(event) {
 });
 
 $(window).click(function() {
-    let hiddenMenu = $('#hidden_menu')
-    if (hiddenMenu.is(":visible")) {
+    if ($('#hidden_menu').is(":visible")) {
         $( "#profile_img" ).click()
+    }
+    if ($('#alert').is(":visible")) {
+        $( "#cross" ).click()
     }
 });
 
