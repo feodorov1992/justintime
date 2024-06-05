@@ -19,7 +19,7 @@
             <p>Добавить груз</p>
         </div>
         <div id="form_submit">
-            <a class="gray_link" href="{% if request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'orders_list' %}{% endif %}">Отмена</a>
+            <a class="gray_link" href="{% if request.META.HTTP_REFERER and 'auth' not in request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'orders_list' %}{% endif %}">Отмена</a>
             <input class="button big_button" type="submit" value="{% block button_label %}{% endblock %}">
         </div>
     </form>

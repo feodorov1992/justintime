@@ -5,7 +5,7 @@ $('#hidden_menu').click(function(event) {
     event.stopPropagation();
 });
 
-$('#alert').click(function(event) {
+$('#alert>div').click(function(event) {
     event.stopPropagation();
 });
 
