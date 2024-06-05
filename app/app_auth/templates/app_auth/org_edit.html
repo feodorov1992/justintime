@@ -1,0 +1,3 @@
+{% extends 'core/form_view.html' %}
+{% block tab_title %}Профиль {{ request.user.org.legal_name }}{% endblock %}
+{% block page_title %}Профиль организации <span class="order_number">{{ request.user.org.legal_name }}</span>{% endblock %}

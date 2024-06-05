@@ -68,6 +68,8 @@ class OrderCreateView(LoginRequiredMixin, View):
             formset.instance = obj
             formset.save()
             obj.object_created(request.user, obj.get_state(related_objects='cargos'))
+            messages.success(request, 'Ваша заявка принята')
+            messages.info(request, 'Дождитесь ответа нашего менеджера')
             return redirect('order_detail', pk=obj.pk)
         if form.errors:
             logger.error(form.errors)
@@ -76,6 +78,8 @@ class OrderCreateView(LoginRequiredMixin, View):
         nfe = formset.non_form_errors()
         if nfe:
             logger.error(nfe)
+        messages.error(request, 'Форма заполнена с ошибками')
+        messages.info(request, 'Пожалуйста, исправьте')
         return render(request, self.template_name, {'form': form, 'formset': formset})
 
 
@@ -105,6 +109,8 @@ class OrderUpdateView(LoginRequiredMixin, View):
             formset.instance = obj
             formset.save()
             obj.object_updated(request.user, self.old_state, obj.get_state(related_objects='cargos'))
+            messages.success(request, f'Заявка № {obj.number} обновлена')
+            messages.info(request, 'Дождитесь ответа нашего менеджера')
             return redirect('order_detail', pk=obj.pk)
         if form.errors:
             logger.error(form.errors)
@@ -113,4 +119,6 @@ class OrderUpdateView(LoginRequiredMixin, View):
         nfe = formset.non_form_errors()
         if nfe:
             logger.error(nfe)
+        messages.error(request, 'Форма заполнена с ошибками')
+        messages.info(request, 'Пожалуйста, исправьте')
         return render(request, self.template_name, {'form': form, 'formset': formset, 'order': order})

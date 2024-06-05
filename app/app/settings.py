@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rangefilter',
     'admin_auto_filters',
     'django_genericfilters',
+    'core',
     'cats',
     'orgs',
     'geo',

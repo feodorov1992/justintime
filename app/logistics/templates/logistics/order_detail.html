@@ -1,7 +1,8 @@
-{% extends 'logistics/base.html' %}
+{% extends 'core/base.html' %}
 {% block title %}Заявка № {{ order.number }}{% endblock %}
 {% block content %}{% load static %}
-    {% if request.META.HTTP_REFERER and request.META.HTTP_REFERER != request.build_absolute_uri %} <div class="back_url"><a href="{{request.META.HTTP_REFERER|escape}}"><img src="{% static 'img/lq.svg' %}" alt="">Вернуться в ленту заявок</a></div> {% endif %}
+    {% url 'orders_list' as orders_list_url %}
+    <div class="back_url"><a href="{% if request.META.HTTP_REFERER and orders_list_url in request.META.HTTP_REFERER %}{{request.META.HTTP_REFERER|escape}}{% else %}{{ orders_list_url }}{% endif %}"><img src="{% static 'img/lq.svg' %}" alt="">Вернуться в ленту заявок</a></div>
     <div class="headline">
         <h1>Информация по заявке № <span class="order_number">{{ order.number }}</span></h1>
         <div>Дата создания заявки: <span class="field_value">{{ order.date|date:"SHORT_DATE_FORMAT" }}</span></div>

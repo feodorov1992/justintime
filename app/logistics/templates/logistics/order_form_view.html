@@ -1,4 +1,4 @@
-{% extends 'logistics/base.html' %}
+{% extends 'core/base.html' %}
 {% block title %}{% block tab_title %}{% endblock %}{% endblock %}
 {% block content %}
     <h1>{% block page_title %}{% endblock %}</h1>
@@ -19,8 +19,8 @@
             <p>Добавить груз</p>
         </div>
         <div id="form_submit">
-            <a class="gray_link" href="{% if request.META.HTTP_REFERER and request.META.HTTP_REFERER != request.build_absolute_uri %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'orders_list' %}{% endif %}">Отмена</a>
-            <input class="button big_button" type="submit" value="Отправить заявку">
+            <a class="gray_link" href="{% if request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'orders_list' %}{% endif %}">Отмена</a>
+            <input class="button big_button" type="submit" value="{% block button_label %}{% endblock %}">
         </div>
     </form>
     <script>

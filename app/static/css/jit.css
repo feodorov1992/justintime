@@ -46,15 +46,57 @@ header a {
 .menu a {
     color: white;
     font-size: 18px;
-    /*font-weight: 600;*/
     margin-left: 30px;
     text-decoration: none;
-    display: inline-block;
 }
 
 a img {
     height: 100%;
     width: 100%;
+}
+
+#profile {
+    position: relative;
+    margin-left: 30px;
+}
+
+#profile_img {
+    height: 25px;
+    padding: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#profile_img img {
+    height: 100%;
+}
+
+#profile_img.active {
+    background: #E9F3FE;
+}
+
+#hidden_menu {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    padding: 15px;
+    border-radius: 8px;
+    background: #E9F3FE;
+    color: #1C477E !important;
+    white-space: nowrap;
+    z-index: 1000;
+    font-size: 14px;
+}
+
+#hidden_menu a {
+    font-weight: 600;
+    color: #1C477E !important;
+    font-size: 14px;
+    margin-left: 0;
 }
 
 #content {
@@ -693,6 +735,70 @@ ul.status_list {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.small_form>div {
+    min-width: 500px;
+}
+
+.small_form table {
+    width: 100%;
+    table-layout: auto;
+}
+
+.small_form #form_submit {
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.small_form h2 {
+    text-align: center;
+}
+
+.small_form th {
+    text-align: start;
+    width: 1%;
+    white-space: nowrap;
+    padding-right: 15px;
+}
+
+.small_form input[type=text],
+.small_form input[type=number],
+.small_form input[type=email],
+.small_form input[type=password] {
+    width: calc(100% - 12px);
+}
+
+.small_form .select2-container {
+    width: 100% !important;
+}
+
+.message {
+    text-align: center;
+}
+
+.message_img {
+    width: 100%;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message_img>img {
+    height: 100%;
+}
+
+.message_title {
+    text-align: center;
+}
+
+.message_success {
+    color: #012F55;
+}
+
+.message_error {
+    color: red;
 }
 
 .popup_content {

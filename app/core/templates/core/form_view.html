@@ -1,0 +1,22 @@
+{% extends 'core/base.html' %}
+{% block title %}{% block tab_title %}{% endblock %}{% endblock %}
+{% block content %}
+    <div class="small_form">
+        <div>
+            <h2>{% block page_title %}{% endblock %}</h2>
+            <form method="post" action="{{ request.path }}{% if request.META.HTTP_REFERER and request.path != login_url %}?next={{ request.META.HTTP_REFERER }}{% endif %}">
+                {% csrf_token %}
+                <table>
+                    {{ form.as_table }}
+                </table>
+                <div id="form_submit">
+                    {% url 'login' as login_url %}
+                    {% if request.META.HTTP_REFERER and request.path != login_url %}
+                        <a class="gray_link" href="{% if 'auth' in request.META.HTTP_REFERER %}{% url 'home' %}{% else %}{{ request.META.HTTP_REFERER }}{% endif %}">Отмена</a>
+                    {% endif %}
+                    <input type="submit" class="button big_button" value="{% block button_label %}Сохранить{% endblock %}">
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

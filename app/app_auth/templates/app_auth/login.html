@@ -1,13 +1,4 @@
-{% extends 'logistics/base.html' %}
-{% block title %}Вход{% endblock %}
-{% block content %}
-    <div class="small_form">
-        <form method="post">
-            {% csrf_token %}
-            <table>
-                {{ form.as_table }}
-            </table>
-            <input type="submit" class="button big_button" value="Войти">
-        </form>
-    </div>
-{% endblock %}
+{% extends 'core/form_view.html' %}
+{% block tab_title %}Вход{% endblock %}
+{% block page_title %}Вход{% endblock %}
+{% block button_label %}Войти{% endblock %}

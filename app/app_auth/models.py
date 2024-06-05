@@ -40,7 +40,7 @@ class User(AbstractModel, AbstractUser):
             self.is_staff = False
         if self.is_staff:
             self.main_manager = None
-        if self.username and not self.email:
+        if self.username:
             self.email = self.username
         super(User, self).save(*args, **kwargs)
 
