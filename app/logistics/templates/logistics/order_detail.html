@@ -214,6 +214,25 @@
                 <div class="pseudo_th">{{ order.sum_quantity|floatformat }}</div>
             </div>
         </div>
+        <div class="pseudo_table">
+            <h3>Документы</h3>
+            <div class="pseudo_tr one_col">
+                <div class="pseudo_td">
+                    <div class="docs_list">
+                        {% for doc in docs %}
+                        <div class="docs_item">
+                            <img class="doc_icon" src="{% static 'img/doc_icon.svg' %}" alt="">
+                            <a class="doc_download" href="{{ doc.file.url }}" download="download">{{ doc.title }}</a>
+                            <a class="doc_delete" href="{% url 'doc_delete' order_pk=order.pk pk=doc.pk %}"><img src="{% static 'img/cross_fat.svg' %}" alt=""></a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="pseudo_td">
+                     <a class="button" href="{% url 'doc_add' order_pk=order.pk %}">Загрузить файл</a>
+                </div>
+            </div>
+        </div>
     </div>
     <div>
         <h3 class="open_mark" data-target_id="#cargo_table">Детализация по грузам <img src="{% static 'img/down_quote.svg' %}" alt=""></h3>

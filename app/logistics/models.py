@@ -356,9 +356,9 @@ class OrderStatus(AbstractModel):
 
 def path_by_order(instance, filename, month=None, year=None):
     if not month:
-        month = instance.order.order_date.month
+        month = instance.order.date.month
     if not year:
-        year = instance.order.order_date.year
+        year = instance.order.date.year
     return os.path.join(
         'files',
         'orders',
@@ -373,10 +373,16 @@ class AttachedDocument(AbstractModel):
     title = models.CharField(max_length=255, verbose_name='Наименование документа')
     file = models.FileField(verbose_name='Файл', upload_to=path_by_order)
     is_public = models.BooleanField(default=False, db_index=True, verbose_name='Показать клиенту')
+    allow_delete = models.BooleanField(default=False, verbose_name='Клиент может удалить')
     order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заявка')
 
     def __str__(self):
         return self.title
+
+    def delete(self, *args, **kwargs):
+        if self.file:
+            self.file.delete()
+        super().delete(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Приложенный файл'

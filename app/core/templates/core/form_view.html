@@ -4,7 +4,7 @@
     <div class="small_form">
         <div>
             <h2>{% block page_title %}{% endblock %}</h2>
-            <form method="post" action="{{ request.path }}{% if request.META.HTTP_REFERER and request.path != login_url %}?next={{ request.META.HTTP_REFERER }}{% endif %}">
+            <form method="post" action="{{ request.path }}{% if request.META.HTTP_REFERER and request.path != login_url %}?next={{ request.META.HTTP_REFERER }}{% endif %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <table>
                     {{ form.as_table }}
@@ -17,6 +17,7 @@
                     <input type="submit" class="button big_button dark_button" value="{% block button_label %}Сохранить{% endblock %}">
                 </div>
             </form>
+            {% block extra_html %}{% endblock %}
         </div>
     </div>
 {% endblock %}

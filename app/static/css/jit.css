@@ -879,6 +879,49 @@ ul.status_list {
     width: 100%;
 }
 
+.docs_list {
+    display: flex;
+    width: 100%;
+    flex-flow: row wrap;
+}
+
+.docs_item {
+    display: flex;
+    align-items: center;
+    height: 25px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    flex-wrap: nowrap;
+}
+
+.docs_item>* {
+    margin-right: 5px;
+}
+
+.doc_icon {
+    height: 20px;
+}
+
+a.doc_download {
+    color: #19A216;
+    white-space: nowrap;
+}
+
+a.doc_download:hover {
+    color: #2AE926;
+}
+
+.doc_delete {
+    display: flex;
+    height: 8px;
+    width: 8px;
+}
+
+.doc_delete>img {
+    height: 100%;
+    width: 100%;
+}
+
 /*#cross svg:hover {*/
 /*    background-color: black;*/
 /*    stroke: white;*/
