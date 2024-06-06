@@ -14,7 +14,7 @@
                     {% if request.META.HTTP_REFERER and request.path != login_url %}
                         <a class="gray_link" href="{% if 'auth' in request.META.HTTP_REFERER %}{% url 'home' %}{% else %}{{ request.META.HTTP_REFERER }}{% endif %}">Отмена</a>
                     {% endif %}
-                    <input type="submit" class="button big_button" value="{% block button_label %}Сохранить{% endblock %}">
+                    <input type="submit" class="button big_button dark_button" value="{% block button_label %}Сохранить{% endblock %}">
                 </div>
             </form>
         </div>

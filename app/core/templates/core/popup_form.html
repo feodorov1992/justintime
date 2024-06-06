@@ -1,4 +1,4 @@
-{% extends 'orgs/base_popup.html' %}
+{% extends 'core/base_popup.html' %}
 {% block title %}{% block tab_title %}{% endblock %}{% endblock %}
 {% block content %}
 <h2>{% block page_title %}{% endblock %}</h2>
@@ -7,6 +7,6 @@
         <input type="hidden" name="_popup" value="1">
         <input type="hidden" name="_to_field" value="id">
         {{ form.as_div }}
-        <input class="button big_button" type="submit" value="Сохранить" name="_save">
+        <input class="button big_button dark_button" type="submit" value="Сохранить" name="_save">
     </form>
 {% endblock %}

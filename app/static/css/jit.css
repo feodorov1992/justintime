@@ -99,6 +99,10 @@ a img {
     margin-left: 0;
 }
 
+#hidden_menu a:hover {
+    color: #8EB5E8 !important;
+}
+
 #content {
     flex: 1 0 auto;
 }
@@ -112,6 +116,18 @@ a img {
     font-size: 16px;
     cursor: pointer;
     min-width: 100px;
+}
+
+.button:hover {
+    background-color: #0D386E;
+}
+
+.dark_button {
+    background-color: #012F55;
+}
+
+.dark_button:hover {
+    background-color: #08243A;
 }
 
 .big_button {
@@ -146,6 +162,11 @@ a.button {
     border-bottom: 2px solid transparent;
     display: block;
     margin-bottom: -2px;
+}
+
+.submenu .links a:hover {
+    color: #3D3D3D;
+    border-color: #3D3D3D;
 }
 
 .submenu .links a.selected {
@@ -267,6 +288,10 @@ a.filter-clear {
     font-size: 14px;
 }
 
+a.filter-clear:hover {
+    color: #3D3D3D;
+}
+
 .orders-list {
     width: calc(100% - 310px) !important;
 }
@@ -306,6 +331,10 @@ a.filter-clear {
     color: #1C477E;
 }
 
+.orders-list-item-links a:hover {
+    color: #8EB5E8;
+}
+
 .pagination {
     float: right;
     margin-top: 15px;
@@ -314,7 +343,6 @@ a.filter-clear {
 .step-links {
     font-size: 14px;
     font-weight: 600;
-    color: #787878;
 }
 
 .step-links>* {
@@ -324,6 +352,10 @@ a.filter-clear {
 .step-links a {
     color: #787878;
     text-decoration: none;
+}
+
+.step-links a:hover {
+    color: #3D3D3D;
 }
 
 .current {
@@ -336,10 +368,11 @@ a.filter-clear {
     font-weight: 600;
     color: #19A216;
     cursor: pointer;
+    text-decoration: underline;
 }
 
 .order_status:hover {
-    text-decoration: underline;
+    color: #2AE926;
 }
 
 .field_value {
@@ -523,6 +556,12 @@ footer {
     min-height: 150px;
 }
 
+#alert .order_status {
+    text-decoration: none !important;
+    color: #19A216 !important;
+    cursor: auto;
+}
+
 #cross{
     height: 20px;
     width: 20px;
@@ -698,6 +737,10 @@ ul.status_list {
     border-radius: 8px;
     margin-top: 10px;
     cursor: pointer;
+}
+
+#add_cargo:hover {
+    background: #8EB6E9;
 }
 
 #form_submit {
