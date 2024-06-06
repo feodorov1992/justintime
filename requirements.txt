@@ -1,4 +1,6 @@
 Django
+psycopg2
+uWSGI
 Pillow
 xlwt
 celery

@@ -2,7 +2,7 @@
 /*.dev.*
 /.idea/
 /*/db.sqlite3
-/deploy/
+/.build
 /db.sqlite3
 /Dockerfile
 /.dockerignore
