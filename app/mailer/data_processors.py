@@ -1,8 +1,12 @@
 import datetime
 import uuid
+from email.mime.image import MIMEImage
+from functools import lru_cache
 from typing import Iterable, List
 
+from django.contrib.staticfiles import finders
 from django.db import models
+from django.template.defaultfilters import safe
 from django.template.loader import render_to_string
 
 
@@ -89,9 +93,11 @@ class TableRow:
 
 class DataProcessor:
     html_template: str = None
+    title_style: dict = None
 
-    def __init__(self, data):
+    def __init__(self, data, title=None):
         self._data = data
+        self._title = title
 
     @staticmethod
     def style_string(style: dict):
@@ -108,7 +114,9 @@ class DataProcessor:
 
     def get_context(self):
         data = self.html_data()
-        return {'data': data}
+        title = self._title
+        title_style = self.style_string(self.title_style)
+        return {'data': data, 'title': title, 'title_style': title_style}
 
     def html(self):
         return render_to_string(self.html_template, self.get_context())
@@ -119,8 +127,8 @@ class DataProcessor:
 
 class TextProcessor(DataProcessor):
 
-    def __init__(self, data: str):
-        super(TextProcessor, self).__init__(data)
+    def __init__(self, data: str, title: str = None):
+        super(TextProcessor, self).__init__(data, title)
 
     def html_data(self):
         pass
@@ -135,15 +143,19 @@ class TextProcessor(DataProcessor):
 class ListProcessor(DataProcessor):
     html_template = 'mailer/base/list.html'
     list_style = {'display': 'inline-block', 'padding-inline-start': '0'}
+    marker_style = None
+    item_style = None
 
-    def __init__(self, data: List[list], list_tag: str = 'ul'):
-        super(ListProcessor, self).__init__(data)
+    def __init__(self, data: List[list], list_tag: str = 'ul', title: str = None):
+        super(ListProcessor, self).__init__(data, title)
         self.list_tag = list_tag
 
     def get_context(self):
         context = super(ListProcessor, self).get_context()
         context['tag'] = self.list_tag
-        context['style'] = self.style_string(self.list_style)
+        context['list_style'] = self.style_string(self.list_style)
+        context['marker_style'] = self.style_string(self.marker_style)
+        context['item_style'] = self.style_string(self.item_style)
         return context
 
     def html_data(self):
@@ -171,10 +183,11 @@ class ListProcessor(DataProcessor):
 
 class URLProcessor(DataProcessor):
     html_template = 'mailer/base/link.html'
-    url_style = None
+    url_outer_style = None
+    url_inner_style = None
 
-    def __init__(self, url: str, url_label: str = None, url_text: str = None):
-        super(URLProcessor, self).__init__(url)
+    def __init__(self, url: str, url_label: str = None, url_text: str = None, title: str = None):
+        super(URLProcessor, self).__init__(url, title)
         self.url_label = url_label if url_label else url
         self.url_text = url_text
 
@@ -182,7 +195,8 @@ class URLProcessor(DataProcessor):
         context = super(URLProcessor, self).get_context()
         context['url_text'] = self.url_text
         context['url_label'] = self.url_label
-        context['style'] = self.style_string(self.url_style)
+        context['url_outer_style'] = self.style_string(self.url_outer_style)
+        context['url_inner_style'] = self.style_string(self.url_inner_style)
         return context
 
     def html_data(self):
@@ -214,8 +228,8 @@ class TableProcessor(DataProcessor):
     data_values_tag: str = 'td'
     row_class.cell_class = cell_class
 
-    def __init__(self, data: Iterable[list], header: list = None):
-        super(TableProcessor, self).__init__(data)
+    def __init__(self, data: Iterable[list], header: list = None, title: str = None):
+        super(TableProcessor, self).__init__(data, title)
         self.__header = header
         self.check_data()
 
@@ -280,33 +294,42 @@ class EmailBodyGenerator:
         self.__data = list()
         self.__add_header()
 
-    def __add_data(self, processor_class, content, *params, row_style: dict = None, content_style: dict = None):
+    def __add_data(self, processor_class, content, *params, row_style: dict = None, content_style: dict = None,
+                   title: str = None):
         if row_style is None:
             row_style = self.main_row_style
         if content_style is None:
             content_style = self.main_content_style
         self.__data.append([
-            processor_class(content, *params),
+            processor_class(content, *params, title=title),
             DataProcessor.style_string(row_style),
             DataProcessor.style_string(content_style),
         ])
 
     def __add_header(self):
-        self.__add_data(self.text_processor_class, self.header,
+        self.__add_data(self.text_processor_class, safe(self.header),
                         row_style=None if self.header_row_style is None else self.header_row_style,
                         content_style=None if self.header_cell_style is None else self.header_cell_style)
 
-    def add_text(self, text):
-        self.__add_data(self.text_processor_class, text)
+    @lru_cache()
+    def add_img(self, path, label):
+        with open(finders.find(path), 'rb') as f:
+            logo_data = f.read()
+        logo = MIMEImage(logo_data)
+        logo.add_header('Content-ID', f'<{label}>')
+        return logo
 
-    def add_list(self, data: List[list], list_type='ul'):
-        self.__add_data(self.list_processor_class, data, list_type)
+    def add_text(self, text, title=None):
+        self.__add_data(self.text_processor_class, text, title=title)
 
-    def add_url(self, url, url_label: str = None, url_text: str = None):
-        self.__add_data(self.url_processor_class, url, url_label, url_text)
+    def add_list(self, data: List[list], list_type='ul', title=None):
+        self.__add_data(self.list_processor_class, data, list_type, title=title)
 
-    def add_table(self, data: List[list], header: list):
-        self.__add_data(self.table_processor_class, data, header)
+    def add_url(self, url, url_label: str = None, url_text: str = None, title=None):
+        self.__add_data(self.url_processor_class, url, url_label, url_text, title=title)
+
+    def add_table(self, data: List[list], header: list, title=None):
+        self.__add_data(self.table_processor_class, data, header, title=title)
 
     def html_data(self):
         result = list()

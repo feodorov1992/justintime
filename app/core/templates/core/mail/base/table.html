@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <table border="0" cellpadding="0" cellspacing="0"{% if global_table_style %} style="{{ global_table_style }}"{% endif %}>
+        <tr>
+            <td{% if global_table_style %} style="{{ global_table_style }}"{% endif %}>
+                <table{% if main_table_style %} style="{{ main_table_style }}"{% endif %}>
+                    <tr>
+                        <td>
+                            <img src="cid:header_img" alt="header" height="89">
+                        </td>
+                    </tr>
+                    {% for item in data %}
+                        {{ item }}
+                    {% endfor %}
+                    <tr>
+                        <td>
+                            <img src="cid:footer_img" alt="footer" height="52">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

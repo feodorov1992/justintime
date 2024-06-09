@@ -1,2 +1,2 @@
 {% if url_text %}<p>{{ url_text }}</p>{% endif %}
-<p><a href="{{ data }}" target="_blank"{% if style %} style="{{ style }}"{% endif %}>{{ url_label }}</a></p>
+<p{% if url_outer_style %} style="{{ url_outer_style }}"{% endif %}><a href="{{ data }}" target="_blank"{% if url_inner_style %} style="{{ url_inner_style }}"{% endif %}>{{ url_label }}</a></p>

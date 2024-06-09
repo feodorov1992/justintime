@@ -1,3 +1,6 @@
-<{{ tag }}{% if style %} style="{{ style }}"{% endif %}>{% for row in data %}
-    <li>{{ row|safe }}</li>{% endfor %}
+{% if title %}<span{% if title_style %} style="{{ title_style }}"{% endif %}>{{ title }}</span><br>{% endif %}
+<{{ tag }}{% if list_style %} style="{{ list_style }}"{% endif %}>{% for row in data %}
+    <li{% if marker_style %} style="{{ marker_style }}"{% endif %}>
+        <span{% if item_style %} style="{{ item_style }}"{% endif %}>{{ row|safe }}</span>
+    </li>{% endfor %}
 </{{ tag }}>

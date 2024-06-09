@@ -25,7 +25,9 @@ SECRET_KEY = 'django-insecure-=qwj56pza6&!+$vz(z1mjlzff0$!j-5b&4=-uy*787^tzp-4!a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+DOMAIN = '127.0.0.1'
+
+ALLOWED_HOSTS = [DOMAIN, f'www.{DOMAIN}']
 
 
 # Application definition
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     'rangefilter',
     'admin_auto_filters',
     'django_genericfilters',
+    'mailer',
     'core',
     'cats',
     'orgs',
