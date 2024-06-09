@@ -31,7 +31,7 @@ class UserAdmin(BaseUserAdmin, admin.ModelAdmin, AdminAjaxMixin):
     search_fields = 'username', 'first_name', 'last_name', 'email'
     change_form_template = 'admin/user_change.html'
     add_form = UserCreationForm
-    actions = 'send_confirm_emails',
+    actions = 'send_confirm_emails', 'deactivate'
     add_fieldsets = (
         (
             None,
@@ -90,5 +90,15 @@ class UserAdmin(BaseUserAdmin, admin.ModelAdmin, AdminAjaxMixin):
         messages.success(request, 'Отправлено')
         return redirect(request.META.get('HTTP_REFERER'))
 
+    @action(description="Деактивировать")
+    def deactivate(self, request, queryset):
+        if not queryset:
+            if request.GET:
+                queryset = queryset.model.objects.filter(**request.GET.dict())
+            else:
+                queryset = queryset.model.objects.all()
+        queryset.update(is_active=False)
+        messages.success(request, f'Пользователи деактивированы: {queryset.count()}')
+        return redirect(request.META.get('HTTP_REFERER'))
 
 admin.site.unregister(DjangoGroup)
