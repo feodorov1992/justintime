@@ -14,7 +14,8 @@ from app_auth.models import User
 from cats.models import Currency, Service, Package, CargoParam
 from geo.models import Country, City
 from orgs.models import Organisation, Contract
-from logistics.notifications import order_update_client_notification, order_update_manager_notification
+from logistics.notifications import order_update_client_notification, order_update_manager_notification, \
+    order_create_client_notification, order_create_manager_notification
 
 INS_RATES = (
     (1, '100%'),
@@ -285,6 +286,10 @@ class Order(AbstractModel):
             self.insurance_beneficiary = self.client
         self.status_updated = self.created_at
         self.save()
+        if request.user.is_staff:
+            order_create_client_notification.delay(self.pk, request.user.pk)
+        else:
+            order_create_manager_notification.delay(self.pk, request.user.pk)
 
     def object_updated(self, request, old_state: dict = None, new_state: dict = None):
         changes = self.get_state_changes(old_state=old_state, new_state=new_state)
