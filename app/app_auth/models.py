@@ -8,6 +8,7 @@ from django.dispatch import receiver
 
 from app.models import AbstractModel
 from orgs.models import Organisation
+from app_auth.notifications import user_confirm
 
 
 class User(AbstractModel, AbstractUser):
@@ -53,7 +54,7 @@ class User(AbstractModel, AbstractUser):
 @receiver(post_save, sender=User)
 def save_order(sender, instance: User, created, **kwargs):
     if created:
-        print(instance)
+        user_confirm.delay(instance.pk)
 
 
 class Group(DjangoGroup):

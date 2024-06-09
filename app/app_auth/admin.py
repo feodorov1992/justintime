@@ -1,10 +1,14 @@
 import autocomplete_all as admin
+from django.contrib import messages
+from django.contrib.admin import action
 from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.forms import ModelForm
+from django.shortcuts import redirect
 
 from app.mixins import AdminAjaxMixin
 from app_auth.models import Group, User, DjangoGroup
+from app_auth.notifications import user_confirm, user_confirm_mass
 from orgs.admin import OrgAdminFilter
 
 
@@ -25,7 +29,9 @@ class UserAdmin(BaseUserAdmin, admin.ModelAdmin, AdminAjaxMixin):
     list_display = '__str__', 'organization', 'email', 'is_staff'
     list_filter = OrgAdminFilter, 'is_staff', 'is_superuser', 'is_active'
     search_fields = 'username', 'first_name', 'last_name', 'email'
+    change_form_template = 'admin/user_change.html'
     add_form = UserCreationForm
+    actions = 'send_confirm_emails',
     add_fieldsets = (
         (
             None,
@@ -72,6 +78,17 @@ class UserAdmin(BaseUserAdmin, admin.ModelAdmin, AdminAjaxMixin):
                 return queryset.filter(organization_id=client_id)
             return queryset.none()
         return queryset
+
+    @action(description="Отправить регистрационные письма")
+    def send_confirm_emails(self, request, queryset):
+        if not queryset:
+            if request.GET:
+                queryset = queryset.model.objects.filter(**request.GET.dict())
+            else:
+                queryset = queryset.model.objects.all()
+        user_confirm_mass.delay(list(queryset.values_list('id', flat=True)))
+        messages.success(request, 'Отправлено')
+        return redirect(request.META.get('HTTP_REFERER'))
 
 
 admin.site.unregister(DjangoGroup)

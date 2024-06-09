@@ -1,15 +1,25 @@
 from django.contrib import messages
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView as BaseLoginView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from django.contrib.auth.views import LoginView as BaseLoginView, \
+    PasswordResetConfirmView as BasePasswordResetConfirmView, PasswordResetView as BasePasswordResetView
 from django.contrib.auth.views import LogoutView as BaseLogoutView
 from django.contrib.auth.views import PasswordChangeView as BasePasswordChangeView
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
+from django.views import View
 from django.views.generic import UpdateView, CreateView
 
 from app_auth.forms import UserForm, OrgForm
 from app_auth.models import User
+from app_auth.notifications import user_confirm, password_restore
+
+
+def send_confirmation_email(request, pk, email_task=user_confirm):
+    email_task.delay(pk)
+    messages.success(request, 'Письмо отправлено')
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
 
 
 class ReturnBackMixin:
@@ -94,3 +104,31 @@ class PasswordChangeView(LoginRequiredMixin, ReturnBackMixin, BasePasswordChange
     def get_success_url(self):
         messages.success(self.request, 'Пароль успешно изменен')
         return self.return_link()
+
+
+class PasswordResetView(BasePasswordResetView):
+    template_name = 'app_auth/password_reset_request.html'
+
+    def form_valid(self, form):
+        email = form.cleaned_data.get('email')
+        filtered_qs = User.objects.filter(email=email)
+        if email and filtered_qs.exists():
+            user = filtered_qs.first()
+            return send_confirmation_email(self.request, pk=user.pk, email_task=password_restore)
+        form.add_error('email', 'Пользователь не найден')
+        return super(PasswordResetView, self).form_invalid(form)    
+
+
+class PasswordResetConfirmView(BasePasswordResetConfirmView):
+    template_name = 'app_auth/password_reset_confirm.html'
+
+    def get_success_url(self):
+        messages.success(self.request, 'Пароль успешно изменен')
+        return reverse('login')
+
+    def render_to_response(self, context, **response_kwargs):
+        if not context.get('validlink'):
+            messages.error(self.request, 'Ссылка недействительна')
+            messages.info(self.request, 'Пожалуйста, запросите новую')
+            return redirect('home')
+        return super(PasswordResetConfirmView, self).render_to_response(context, **response_kwargs)

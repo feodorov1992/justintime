@@ -9,6 +9,7 @@
                 <table>
                     {{ form.as_table }}
                 </table>
+                <div class="extra_links">{% block extra_links %}{% endblock %}</div>
                 <div id="form_submit">
                     {% url 'login' as login_url %}
                     {% if request.META.HTTP_REFERER and request.path != login_url %}

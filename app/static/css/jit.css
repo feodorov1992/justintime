@@ -324,6 +324,11 @@ a.filter-clear:hover {
     background: #E9F2FE;
 }
 
+.extra_links {
+    margin-top: 15px;
+}
+
+.extra_links a,
 .orders-list-item-links a {
     margin: 0 10px;
     font-size: 16px;
