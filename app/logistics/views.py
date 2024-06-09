@@ -73,7 +73,7 @@ class OrderCreateView(LoginRequiredMixin, View):
             obj.save()
             formset.instance = obj
             formset.save()
-            obj.object_created(request.user, obj.get_state(related_objects='cargos'))
+            obj.object_created(request, obj.get_state(related_objects='cargos'))
             messages.success(request, 'Ваша заявка принята')
             messages.info(request, 'Дождитесь ответа нашего менеджера')
             return redirect('order_detail', pk=obj.pk)
@@ -108,13 +108,14 @@ class OrderUpdateView(LoginRequiredMixin, View):
 
     def post(self, request, pk):
         order = self.model.objects.get(pk=pk)
+        self.old_state = order.get_state(related_objects='cargos')
         form = self.form_class(instance=order, data=request.POST, user=request.user)
         formset = self.formset_class(instance=order, data=request.POST)
         if form.is_valid() and formset.is_valid():
             obj = form.save()
             formset.instance = obj
             formset.save()
-            obj.object_updated(request.user, self.old_state, obj.get_state(related_objects='cargos'))
+            obj.object_updated(request, self.old_state, obj.get_state(related_objects='cargos'))
             messages.success(request, f'Заявка № {obj.number} обновлена')
             messages.info(request, 'Дождитесь ответа нашего менеджера')
             return redirect('order_detail', pk=obj.pk)

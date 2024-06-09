@@ -193,9 +193,9 @@ class OrderAdmin(admin.ModelAdmin):
         super(OrderAdmin, self).save_related(request, form, formsets, change)
         new_state = form.instance.get_state(related_objects='cargos')
         if self.old_state is None:
-            form.instance.object_created(request.user, new_state)
+            form.instance.object_created(request, new_state)
         else:
-            form.instance.object_updated(request.user, self.old_state, new_state)
+            form.instance.object_updated(request, self.old_state, new_state)
 
     def add_view(self, request, form_url="", extra_context=None):
         self.old_state = None

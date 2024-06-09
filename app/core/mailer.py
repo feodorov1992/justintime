@@ -15,11 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class TableProcessor(BaseTableProcessor):
-    table_style: dict = {'font-family': '"Open Sans", sans-serif', 'border-collapse': 'collapse'}
+    table_style: dict = {'font-family': '"Open Sans", sans-serif', 'border-collapse': 'collapse', 'width': '540px'}
     header_row_style: dict = {'border': '1px solid #012F55'}
     header_cell_style: dict = {'background': '#012F55', 'color': 'white', 'font-weight': '700', 'padding': '5px',
                                'line-height': '24px', 'font-size': '14px', 'vertical-align': 'center',
-                               'text-align': 'start'}
+                               'text-align': 'start', 'white-space': 'nowrap'}
     data_cell_style: dict = {'border': '1px solid #012F55', 'padding': '5px', 'color': '#102E52',
                              'line-height': '24px', 'font-size': '12px', 'vertical-align': 'center',
                              'text-align': 'start'}
@@ -35,7 +35,7 @@ class ListProcessor(BaseListProcessor):
 class URLProcessor(BaseURLProcessor):
     url_outer_style = {'font-size': '16px', 'padding': '10px', 'background': '#012F55', 'border-radius': '8px',
                        'min-width': '200px', 'text-align': 'center', 'border': '1px solid #012F55',
-                       'display': 'inline-block'}
+                       'display': 'block'}
     url_inner_style = {'color': 'white', 'text-decoration': 'none'}
 
 
@@ -128,37 +128,3 @@ class MailNotification:
             log_msg.append('ALLOW_TO_SEND_MAIL set to False. Email not sent')
         log('; '.join(log_msg))
         return result
-
-# def test_mail(request):
-#     email = NotificationGenerator('Определена плановая дата доставки груза<br><u>8593 P-C/2024/РТЛ (60515)</u>')
-#     email.add_table([
-#         ['Номер-хуемер', 'Что-то очень полезное', 'Циферки'],
-#         ['Важный перец', 'Что-то очень полезное', 'Циферки'],
-#         ['Заявленное количество мест говна', 'Что-то очень полезное', 'Циферки'],
-#         ['Важный перец', 'Что-то очень полезное', 'Циферки'],
-#         ['Номер-хуемер', 'Что-то очень полезное', 'Циферки'],
-#         ['Важный перец', 'Что-то очень полезное', 'Циферки']
-#     ], ['Какой-то ебаный заголовок номер один', 'Что-то очень полезное', 'Циферки'])
-#     email.add_list([['Ваши документы'], ['Место на складе'], ['Наших водителей к работе с вами. Морально']],
-#                    title='Мы готовим:')
-#     email.add_list([['Ждите письма менеджера'], ['Очень терпеливо ждите'], ['Нет, звонок не поможет ускорить процесс'],
-#                     ['Если все же вам хочется позвонить, сначала сходите нахер']], 'ol', title='Ваши следующие шаги:')
-#     email.add_url(request.build_absolute_uri(), 'Смотреть на портале',
-#                   'Чтобы увидеть подробности, перейдите по ссылке:')
-#     msg = EmailMultiAlternatives(
-#         subject='subject',
-#         body=email.txt(),
-#         from_email=settings.EMAIL_HOST_USER,
-#         to=[settings.EMAIL_HOST_USER]
-#     )
-#     msg.mixed_subtype = 'related'
-#     msg.attach_alternative(email.html(), "text/html")
-#     for img in email.images:
-#         msg.attach(img)
-#
-#     try:
-#         result = msg.send(fail_silently=False)
-#         messages.success(request, result)
-#     except Exception as e:
-#         messages.error(request, e)
-#     return redirect(request.META.get('REFERER', '/'))

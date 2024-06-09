@@ -162,6 +162,8 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'feodorov1992@mail.ru'
 EMAIL_HOST_PASSWORD = 'sYN89wjsBz0KPFvRY9bp'
 
+ALLOW_TO_SEND_MAIL = True
+
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache"

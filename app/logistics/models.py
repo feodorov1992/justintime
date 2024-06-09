@@ -14,6 +14,7 @@ from app_auth.models import User
 from cats.models import Currency, Service, Package, CargoParam
 from geo.models import Country, City
 from orgs.models import Organisation, Contract
+from logistics.notifications import order_update_client_notification, order_update_manager_notification
 
 INS_RATES = (
     (1, '100%'),
@@ -300,6 +301,9 @@ class Order(AbstractModel):
             if current_value != new_value:
                 m2m = {field.name: field for field in self._meta.many_to_many}
                 if key not in m2m:
+                    field = self._meta.get_field(key)
+                    if not key.endswith('_id') and field.is_relation:
+                        key = f'{key}_id'
                     self.__setattr__(key, new_value)
                 else:
                     self.__getattribute__(key).set(new_value)
@@ -309,6 +313,10 @@ class Order(AbstractModel):
             updated = True
         if updated:
             self.save()
+        if request.user.is_staff:
+            order_update_client_notification.delay(self.pk, request.user.pk, changes)
+        else:
+            order_update_manager_notification.delay(self.pk, request.user.pk, changes)
 
     def __str__(self):
         return f'Заявка №{self.number} от {self.date.strftime("%d.%m.%Y")}'

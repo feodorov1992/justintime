@@ -179,8 +179,12 @@ class AbstractModel(models.Model):
 
         return result
 
-    @staticmethod
-    def clean_value(value):
+    def clean_value(self, key, value):
+
+        field = self._meta.get_field(key)
+        if field.is_relation:
+            return str(field.related_model.objects.get(pk=value))
+
         if isinstance(value, float) or isinstance(value, int):
             return floatformat(value, -2)
         elif isinstance(value, datetime.datetime):
@@ -196,8 +200,8 @@ class AbstractModel(models.Model):
         result = [
             {
                 'verbose': verbose_names.get(key, key),
-                'old': self.clean_value(value.get('old')),
-                'new': self.clean_value(value.get('new'))
+                'old': self.clean_value(key, value.get('old')),
+                'new': self.clean_value(key, value.get('new'))
             } for key, value in changes_dict.items()
         ]
         if flat:
