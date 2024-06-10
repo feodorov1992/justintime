@@ -1,12 +1,8 @@
 from django import forms
-from django.forms import ModelForm, formset_factory, inlineformset_factory
-from django_genericfilters import forms as gf
-from django_select2.forms import ModelSelect2Widget
+from django.forms import ModelForm, inlineformset_factory
 
-from app_auth.models import User
-from logistics.filtersets import ClientWidget, ManagerWidget, MySelect2Widget
-from logistics.models import ORDER_STATUS_LABELS, Order, Cargo
-from orgs.models import Organisation
+from logistics.filtersets import ClientWidget, MySelect2Widget
+from logistics.models import Order, Cargo
 
 
 class ContractWidget(MySelect2Widget):

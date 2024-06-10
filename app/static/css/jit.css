@@ -825,6 +825,7 @@ ul.status_list {
     width: calc(100% - 12px);
 }
 
+.popup_content form .select2-container,
 .small_form .select2-container {
     width: 100% !important;
 }
