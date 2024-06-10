@@ -50,6 +50,10 @@ header a {
     text-decoration: none;
 }
 
+.menu a:hover {
+    color: #8EB5E8;
+}
+
 a img {
     height: 100%;
     width: 100%;
@@ -732,6 +736,10 @@ ul.status_list {
     justify-content: center;
     border-radius: 8px;
     cursor: pointer;
+}
+
+.cargo_form .del_btn:hover {
+    background: #F4B7B7
 }
 
 #add_cargo {
