@@ -27,6 +27,15 @@ class OrderListView(LoginRequiredMixin, FilterView):
     filterset_class = OrderFilterSet
     paginate_by = 5
     login_url = 'login'
+    exclude_for_clients = 'client',
+
+    def get_filterset(self, filterset_class):
+        filterset = super(OrderListView, self).get_filterset(filterset_class)
+        if not self.request.user.is_staff:
+            for excluded_filter in self.exclude_for_clients:
+                if excluded_filter in filterset.filters:
+                    del filterset.filters[excluded_filter]
+        return filterset
 
 
 class OrderDetailView(LoginRequiredMixin, DetailView):
