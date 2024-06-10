@@ -59,6 +59,8 @@ class OrderCreateView(LoginRequiredMixin, View):
         else:
             copy_obj = self.model.objects.get(pk=copy_id)
             copy_obj.id = None
+            copy_obj.number = None
+            copy_obj.client_number = None
             form = self.form_class(instance=copy_obj, user=request.user)
         formset = self.formset_class()
         return render(request, self.template_name, {'form': form, 'formset': formset})

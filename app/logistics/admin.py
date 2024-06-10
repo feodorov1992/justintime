@@ -133,7 +133,7 @@ class OrderAdmin(admin.ModelAdmin):
     old_state = None
     change_form_template = 'admin/order_change.html'
     tech_fields = '_state', 'id', 'created_at', 'last_update'
-    exclude_from_copy_fields = 'number', 'date', 'status'
+    exclude_from_copy_fields = 'number', 'client_number', 'date', 'status'
     actions = 'download_excel',
     act_on_filtered = 'download_excel',
 
