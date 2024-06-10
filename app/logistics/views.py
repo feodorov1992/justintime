@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils import timezone
 from django.views import View
 from django.views.generic import DetailView, DeleteView, CreateView
 from django_filters import FilterSet
@@ -51,17 +52,21 @@ class OrderCreateView(LoginRequiredMixin, View):
     form_class: Type[Form] = OrderForm
     formset_class: Type[BaseFormSet] = CargoFormset
     login_url = 'login'
-    exclude_from_copy_fields = 'id', 'date', 'number', 'client_number'
+    exclude_from_copy_fields = 'id', 'number', 'client_number'
+
+    def copy_obj(self, obj_id):
+        copy_obj = self.model.objects.get(pk=obj_id)
+        for field_name in self.exclude_from_copy_fields:
+            copy_obj.__setattr__(field_name, None)
+        copy_obj.date = timezone.now()
+        return copy_obj
 
     def get(self, request):
         copy_id = request.GET.get('copy')
         if copy_id is None:
             form = self.form_class(user=request.user)
         else:
-            copy_obj = self.model.objects.get(pk=copy_id)
-            for field_name in self.exclude_from_copy_fields:
-                copy_obj.__setattr__(field_name, None)
-            form = self.form_class(instance=copy_obj, user=request.user)
+            form = self.form_class(instance=self.copy_obj(copy_id), user=request.user)
         formset = self.formset_class()
         return render(request, self.template_name, {'form': form, 'formset': formset})
 
