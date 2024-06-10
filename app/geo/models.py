@@ -21,9 +21,14 @@ class Country(AbstractCatalogueModel):
 
 
 class City(AbstractCatalogueModel):
+    name = models.CharField(max_length=100, verbose_name='Наименование', db_index=True)
     country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name='Страна')
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = 'город'
         verbose_name_plural = 'города'
-        ordering = 'name',
+        ordering = 'country', 'name'
+        unique_together = 'country', 'name'
