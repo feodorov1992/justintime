@@ -51,6 +51,7 @@ class OrderCreateView(LoginRequiredMixin, View):
     form_class: Type[Form] = OrderForm
     formset_class: Type[BaseFormSet] = CargoFormset
     login_url = 'login'
+    exclude_from_copy_fields = 'id', 'date', 'number', 'client_number'
 
     def get(self, request):
         copy_id = request.GET.get('copy')
@@ -58,9 +59,8 @@ class OrderCreateView(LoginRequiredMixin, View):
             form = self.form_class(user=request.user)
         else:
             copy_obj = self.model.objects.get(pk=copy_id)
-            copy_obj.id = None
-            copy_obj.number = None
-            copy_obj.client_number = None
+            for field_name in self.exclude_from_copy_fields:
+                copy_obj.__setattr__(field_name, None)
             form = self.form_class(instance=copy_obj, user=request.user)
         formset = self.formset_class()
         return render(request, self.template_name, {'form': form, 'formset': formset})
