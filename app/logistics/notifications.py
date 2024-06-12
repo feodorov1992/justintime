@@ -132,3 +132,36 @@ def order_create_manager_notification(order_pk, user_pk):
 
     email.add_recipients(*get_managers_recipients_from_order(order, user))
     email.send()
+
+
+@app.task
+def quick_order_create_manager_notification(order_pk):
+    sleep(1)
+    quick_order = apps.get_model('logistics', 'QuickOrder').objects.get(pk=order_pk)
+    user = quick_order.created_by
+    subject = f'Создана быстрая заявка № {quick_order.number}'
+    email = MailNotification(subject, subject)
+
+    list_items = [
+        ['Создатель заявки', str(user)],
+        ['Заказчик', str(quick_order.client)]
+    ]
+    if quick_order.client_number:
+        list_items.append(['Клиентский номер', quick_order.client_number])
+
+    email.add_list(list_items)
+    email.add_inner_link(
+        reverse('admin:logistics_quickorder_change', args=[order_pk]),
+        'Смотреть в админке',
+        'Чтобы увидеть подробности, перейдите по ссылке:'
+    )
+    expeditor = apps.get_model('orgs', 'Organisation').objects.get(is_expeditor=True)
+    if user.main_manager and user.main_manager.email:
+        recipients = [user.main_manager.email]
+    elif expeditor.email:
+        recipients = [expeditor.email]
+    else:
+        recipients = expeditor.user_set.filter(email__isnull=False).values_list('email', flat=True)
+
+    email.add_recipients(*recipients)
+    email.send()

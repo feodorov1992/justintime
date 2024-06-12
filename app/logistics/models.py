@@ -6,6 +6,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import QuerySet
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.template.defaultfilters import floatformat
 from django.utils import timezone
 
@@ -15,7 +17,7 @@ from cats.models import Currency, Service, Package, CargoParam
 from geo.models import Country, City
 from orgs.models import Organisation, Contract
 from logistics.notifications import order_update_client_notification, order_update_manager_notification, \
-    order_create_client_notification, order_create_manager_notification
+    order_create_client_notification, order_create_manager_notification, quick_order_create_manager_notification
 
 INS_RATES = (
     (1, '100%'),
@@ -93,6 +95,12 @@ class QuickOrder(AbstractModel):
         verbose_name = 'быстрая заявка'
         verbose_name_plural = 'быстрые заявки'
         ordering = '-number', '-created_at'
+
+
+@receiver(post_save, sender=QuickOrder)
+def save_order(sender, instance: User, created, **kwargs):
+    if created:
+        quick_order_create_manager_notification.delay(instance.pk)
 
 
 class Order(AbstractModel):
