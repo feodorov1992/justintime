@@ -3,8 +3,8 @@
 {% block content %}
     <div class="submenu">
         <div class="links">
-            <a class="selected" href="">Лента заявок</a>
-            <a href="{% url 'quick_orders_list' %}">Лента быстрых заявок</a>
+            <a href="{% url 'orders_list' %}">Лента заявок</a>
+            <a class="selected" href="">Лента быстрых заявок</a>
         </div>
         <div class="buttons">
             <a href="{% url 'order_create' %}" class="button big_button">Создать заявку</a>
@@ -24,34 +24,9 @@
                 </div>
                 {% endif %}
                 <div class="filter-row">
-                    {{ filter.form.manager.label_tag }}
+                    {{ filter.form.processed.label_tag }}
                     <div class="wide-field">
-                        {{ filter.form.manager }}
-                    </div>
-                </div>
-                <div class="filter-row">
-                    {{ filter.form.quick_order.label_tag }}
-                    <div class="wide-field">
-                        {{ filter.form.quick_order }}
-                    </div>
-                </div>
-                <div class="filter-row">
-                    {{ filter.form.status.label_tag }}
-                    <div class="wide-field">
-                        {{ filter.form.status }}
-                    </div>
-                </div>
-                <div class="filter-row">
-                    <label>Дата</label>
-                    <div class="wide-field">
-                        <div class="narrow-field">
-                            {{ filter.form.date__gte.label_tag }}
-                            {{ filter.form.date__gte }}
-                        </div>
-                        <div class="narrow-field">
-                            {{ filter.form.date__lte.label_tag }}
-                            {{ filter.form.date__lte }}
-                        </div>
+                        {{ filter.form.processed }}
                     </div>
                 </div>
                 <div class="filter-row">
@@ -89,46 +64,23 @@
                                 &nbsp;
                                 {% endif %}
                             </p>
-                            <p>&nbsp;</p>
-                            <p>
-                                <span>Пункт отправки</span>
-                            </p>
-                            <p>
-                                <span class="field_value">{{ obj.from_address_short }}</span>
-                            </p>
                         </div>
                         <div class="ol-col">
                             <p>
                                 <span>Дата заявки</span>
-                                <span class="field_value">{{ obj.date|date:"SHORT_DATE_FORMAT" }}</span>
+                                <span class="field_value">{{ obj.created_at|date:"SHORT_DATE_FORMAT" }}</span>
                                 <span>Статус</span>
-                                <span onclick="getModalView('{% url 'order_status' pk=obj.pk %}')" class="order_status {{ obj.status }}">{{ obj.get_status_display }}</span>
-                            </p>
-                            <p>
-                                {% if obj.price %}
-                                <span>Ставка</span>
-                                <span class="field_value">{{ obj.price|floatformat:-2 }} {{ obj.price_currency.displayed_name }}</span>
-                                {% else %}
-                                    &nbsp;
-                                {% endif %}
+                                <span class="quick_order_status{% if not obj.processed %} unprocessed{% endif %}">{% if obj.processed %}Обработана{% else %}Не обработана{% endif %}</span>
                             </p>
                             <p>&nbsp;</p>
-                            <p>
-                                <span>Пункт доставки</span>
-                            </p>
-                            <p>
-                                <span class="field_value">{{ obj.to_address_short }}</span>
-                            </p>
                         </div>
                     </div>
                     <div class="orders-list-item-links">
+                        {% if obj.processed %}
                         <div class="links-group">
-                            <a href="{% url 'order_detail' pk=obj.pk %}">Подробный просмотр</a>
+                            <a href="{% url 'orders_list' %}?quick_order={{ obj.pk }}">Перейти к заявкам</a>
                         </div>
-                        <div class="links-group">
-                            <a href="{% url 'order_update' pk=obj.pk %}">Изменить</a>
-                            <a href="{% url 'order_create' %}?copy={{ obj.pk }}">Скопировать</a>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm, inlineformset_factory
 
 from logistics.filtersets import ClientWidget, MySelect2Widget
-from logistics.models import Order, Cargo
+from logistics.models import Order, Cargo, QuickOrder, QuickAttachedDocument
 
 
 class ContractWidget(MySelect2Widget):
@@ -116,3 +116,33 @@ class CargoForm(ModelForm):
 
 
 CargoFormset = inlineformset_factory(Order, Cargo, form=CargoForm, extra=0, min_num=1, validate_min=True)
+
+
+class QuickOrderForm(forms.ModelForm):
+    required_css_class = 'required'
+
+    class Meta:
+        fields = 'client_number',
+        model = QuickOrder
+
+
+class QuickDocForm(ModelForm):
+    required_css_class = 'required'
+
+    def __init__(self, *args, **kwargs):
+        super(QuickDocForm, self).__init__(*args, **kwargs)
+        self.label_suffix = None
+
+    def as_my_style(self):
+        context = super().get_context()
+        context['fields'] = {f_e[0].name: f_e[0] for f_e in context['fields']}
+        context['hidden_fields'] = {f_e.name: f_e for f_e in context['hidden_fields']}
+        return self.render('logistics/forms/quick_order_file.html', context=context)
+
+    class Meta:
+        model = QuickAttachedDocument
+        fields = 'title', 'file'
+
+
+QuickDocFormset = inlineformset_factory(QuickOrder, QuickAttachedDocument, form=QuickDocForm,
+                                        extra=0, min_num=1, validate_min=True)

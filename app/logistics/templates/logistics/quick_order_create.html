@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+{% block title %}{% block tab_title %}Быстрая заявка{% endblock %}{% endblock %}
+{% block content %}
+    <div class="small_form">
+        <div>
+            <h1>{% block page_title %}Создание быстрой заявки{% endblock %}</h1>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div id="order_form">
+                    <div class="form-2cols">
+                        <div class="form-row">
+                            <div class="form-field">
+                                {{ form.client_number.label_tag }}
+                                {{ form.client_number }}
+                                {% if form.client_number.errors %}{{ form.client_number.errors }}{% else %}&nbsp;{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="quick_doc_formset">
+                    <h3>Файлы</h3>
+                    {{ formset.management_form }}
+                    {{ formset.non_form_errors }}
+                    <div class="container">
+                        {% for form in formset.forms %}
+                            {{ form.as_my_style }}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div id="add_quick_doc">
+                    <p>Добавить документ</p>
+                </div>
+                <div id="form_submit">
+                    <a class="gray_link" href="{% if request.META.HTTP_REFERER and 'auth' not in request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'orders_list' %}{% endif %}">Отмена</a>
+                    <input class="button big_button dark_button" type="submit" value="{% block button_label %}Отправить заявку{% endblock %}"{% if request.user.is_staff %} disabled{% endif %}>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        const quickOrderFormTemplate = '{{ formset.empty_form.as_my_style|escapejs }}'
+    </script>
+{% endblock %}

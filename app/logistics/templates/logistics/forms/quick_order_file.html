@@ -1,0 +1,28 @@
+<div class="cargo_form quick_doc">
+    <div class="hidden_fields">
+        {{ hidden_fields.id }}
+        {{ hidden_fields.quick_order }}
+        {{ fields.DELETE }}
+    </div>
+    <div class="gray_plate">
+        <div class="form-row">
+            <div>
+                <div class="form-field">
+                    {{ fields.title.label_tag }}
+                    {{ fields.title }}
+                    {% if fields.title.errors %}{{ fields.title.errors }}{% else %}&nbsp;{% endif %}
+                </div>
+            </div>
+            <div>
+                <div class="form-field">
+                    {{ fields.file.label_tag }}
+                    {{ fields.file }}
+                    {% if fields.file.errors %}{{ fields.file.errors }}{% else %}&nbsp;{% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="del_btn">{% load static %}
+        <img src="{% static 'img/trash.svg' %}" alt="">
+    </div>
+</div>

@@ -380,6 +380,15 @@ a.filter-clear:hover {
     text-decoration: underline;
 }
 
+.quick_order_status {
+    font-weight: 600;
+    color: #19A216;
+}
+
+.quick_order_status.unprocessed {
+    color: red;
+}
+
 .order_status:hover {
     color: #2AE926;
 }
@@ -708,6 +717,10 @@ label.required::after {
     margin-right: 10px;
 }
 
+.quick_doc  .form-row>div {
+    width: calc(50% - 10px) !important;
+}
+
 .cargo_form .form-field.wide {
     width: 100% !important;
 }
@@ -738,10 +751,15 @@ ul.status_list {
     cursor: pointer;
 }
 
+.quick_doc .del_btn {
+    height: 70px !important;
+}
+
 .cargo_form .del_btn:hover {
     background: #F4B7B7
 }
 
+#add_quick_doc,
 #add_cargo {
     display: flex;
     justify-content: center;
@@ -752,6 +770,7 @@ ul.status_list {
     cursor: pointer;
 }
 
+#add_quick_doc:hover,
 #add_cargo:hover {
     background: #8EB6E9;
 }

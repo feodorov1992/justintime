@@ -48,7 +48,7 @@
                 {% endif %}
                 <a href="{% url 'orders_list' %}">Лента заявок</a>
                 <a href="{% url 'order_create' %}">Создать заявку</a>
-{#                <a href="">Быстрая заявка</a>#}
+                <a href="{% url 'quick_order_create' %}">Быстрая заявка</a>
                 <div id="profile">
                     <div id="profile_img">
                         <img src="{% static 'img/profile_white.svg' %}" alt="profile">

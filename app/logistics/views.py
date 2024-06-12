@@ -16,9 +16,9 @@ from django_filters import FilterSet
 from django_filters.views import FilterView
 from django_genericfilters.views import FilteredListView
 
-from logistics.filtersets import OrderFilterSet
-from logistics.forms import OrderForm, CargoFormset
-from logistics.models import Order, AttachedDocument
+from logistics.filtersets import OrderFilterSet, QuickOrderFilterSet
+from logistics.forms import OrderForm, CargoFormset, QuickOrderForm, QuickDocFormset
+from logistics.models import Order, AttachedDocument, QuickOrder
 
 logger = logging.getLogger(__name__)
 
@@ -185,3 +185,56 @@ class DocAddView(LoginRequiredMixin, CreateView):
         self.object.allow_delete = True
         self.object.save()
         return HttpResponseRedirect(self.get_success_url())
+
+
+class QuickOrderCreateView(LoginRequiredMixin, View):
+    model = QuickOrder
+    template_name = 'logistics/quick_order_create.html'
+    login_url = 'login'
+    form_class = QuickOrderForm
+    formset_class = QuickDocFormset
+
+    def check_user(self):
+        if self.request.user.is_staff:
+            messages.error(self.request, 'Действие запрещено')
+            messages.info(self.request, 'Добавить быструю заявку могут только клиенты!')
+            return redirect(self.request.META.get('HTTP_REFERER', 'home'))
+
+    def get(self, request):
+        check = self.check_user()
+        if check:
+            return check
+        form = self.form_class()
+        formset = self.formset_class()
+        return render(request, self.template_name, {'form': form, 'formset': formset})
+
+    def post(self, request):
+        check = self.check_user()
+        if check:
+            return check
+        form = self.form_class(request.POST)
+        formset = self.formset_class(request.POST, request.FILES)
+        if form.is_valid() and formset.is_valid():
+            obj = form.save(commit=False)
+            obj.created_by = self.request.user
+            obj.client = request.user.organization
+            obj.save()
+            formset.instance = obj
+            formset.save()
+            messages.success(request, 'Ваша заявка принята')
+            messages.info(request, 'Дождитесь ответа нашего менеджера')
+            return redirect('orders_list')
+        if form.errors:
+            logger.error(form.errors)
+        if formset.errors:
+            logger.error(formset.errors)
+        nfe = formset.non_form_errors()
+        if nfe:
+            logger.error(nfe)
+        messages.error(request, 'Форма заполнена с ошибками')
+        messages.info(request, 'Пожалуйста, исправьте')
+        return render(request, self.template_name, {'form': form, 'formset': formset})
+
+
+class QuickOrderListView(OrderListView):
+    filterset_class = QuickOrderFilterSet

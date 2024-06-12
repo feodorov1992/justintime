@@ -32,9 +32,9 @@ ORDER_STATUS_LABELS = (
 )
 
 
-def default_order_number(number: Union[int, str] = None):
+def default_number(model, number: Union[int, str] = None):
     if number is None:
-        obj = Order.objects.first()
+        obj = model.objects.first()
         if obj is None:
             number = getattr(settings, 'START_ORDER_NUMBER', 1)
         else:
@@ -42,6 +42,14 @@ def default_order_number(number: Union[int, str] = None):
     elif isinstance(number, str):
         number = int(number)
     return '{:0>5}'.format(number)
+
+
+def default_order_number(number: Union[int, str] = None):
+    return default_number(Order, number)
+
+
+def default_quick_order_number(number: Union[int, str] = None):
+    return default_number(QuickOrder, number)
 
 
 def int_only_validator(value: str):
@@ -67,6 +75,24 @@ class VolumeProcessor(NumberFieldProcessor):
 class QuantityProcessor(NumberFieldProcessor):
     output_field = 'sum_quantity'
     fields = 'quantity',
+
+
+class QuickOrder(AbstractModel):
+    number = models.CharField(max_length=5, db_index=True, unique=True, verbose_name='Номер заявки',
+                              default=default_quick_order_number, validators=[int_only_validator])
+    client_number = models.CharField(max_length=255, db_index=True, blank=True, verbose_name='Клиентский номер')
+    client = models.ForeignKey(Organisation, on_delete=models.CASCADE, editable=False,
+                               verbose_name='Заказчик', related_name='quick_orders')
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Создатель заявки',
+                                   editable=False, related_name='quick_orders')
+
+    def __str__(self):
+        return f'Быстрая заявка №{self.number}'
+
+    class Meta:
+        verbose_name = 'быстрая заявка'
+        verbose_name_plural = 'быстрые заявки'
+        ordering = '-number', '-created_at'
 
 
 class Order(AbstractModel):
@@ -142,6 +168,8 @@ class Order(AbstractModel):
     sum_weight = models.FloatField(verbose_name='Вес брутто груза, кг', blank=True, null=True)
     sum_volume = models.FloatField(verbose_name='Объем груза, м3', blank=True, null=True)
     sum_quantity = models.IntegerField(verbose_name='Кол-во мест', blank=True, null=True)
+    quick_order = models.ForeignKey(QuickOrder, blank=True, null=True, on_delete=models.SET_NULL,
+                                    verbose_name='Быстрая заявка')
 
     related_fields_mappers = WeightProcessor, QuantityProcessor, VolumeProcessor
 
@@ -382,12 +410,40 @@ def path_by_order(instance, filename, month=None, year=None):
     )
 
 
+def path_by_quick_order(instance, filename, month=None, year=None):
+    return os.path.join(
+        'files',
+        'quick_orders',
+        instance.quick_order.id.hex,
+        filename
+    )
+
+
 class AttachedDocument(AbstractModel):
     title = models.CharField(max_length=255, verbose_name='Наименование документа')
     file = models.FileField(verbose_name='Файл', upload_to=path_by_order)
     is_public = models.BooleanField(default=False, db_index=True, verbose_name='Показать клиенту')
     allow_delete = models.BooleanField(default=False, verbose_name='Клиент может удалить')
     order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заявка')
+
+    def __str__(self):
+        return self.title
+
+    def delete(self, *args, **kwargs):
+        if self.file:
+            self.file.delete()
+        super().delete(*args, **kwargs)
+
+    class Meta:
+        verbose_name = 'Приложенный файл'
+        verbose_name_plural = 'Приложенные файлы'
+        ordering = '-created_at',
+
+
+class QuickAttachedDocument(AbstractModel):
+    title = models.CharField(max_length=255, verbose_name='Наименование документа')
+    file = models.FileField(verbose_name='Файл', upload_to=path_by_quick_order)
+    quick_order = models.ForeignKey(QuickOrder, on_delete=models.CASCADE, verbose_name='Заявка')
 
     def __str__(self):
         return self.title

@@ -77,6 +77,10 @@ $('#add_cargo').click(function () {
     addForm(cargoFormTemplate, $('#cargo_formset'))
 })
 
+$('#add_quick_doc').click(function () {
+    addForm(quickOrderFormTemplate, $('#quick_doc_formset'))
+})
+
 function removeForm(elem) {
     let elemID = elem.find('.hidden_fields input').first().val()
     if (!elemID) {
