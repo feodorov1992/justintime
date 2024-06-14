@@ -16,6 +16,8 @@ from django_filters import FilterSet
 from django_filters.views import FilterView
 from django_genericfilters.views import FilteredListView
 
+from cats.models import Currency
+from geo.models import Country
 from logistics.filtersets import OrderFilterSet, QuickOrderFilterSet
 from logistics.forms import OrderForm, CargoFormset, QuickOrderForm, QuickDocFormset
 from logistics.models import Order, AttachedDocument, QuickOrder
@@ -61,13 +63,22 @@ class OrderCreateView(LoginRequiredMixin, View):
     form_class: Type[Form] = OrderForm
     formset_class: Type[BaseFormSet] = CargoFormset
     login_url = 'login'
-    exclude_from_copy_fields = 'id', 'number', 'client_number'
+    exclude_from_copy_fields = 'id', 'number', 'date', 'client_number', 'cargo_name', 'cargo_value', \
+                               'cargo_value_currency', 'cargo_value_currency_id', 'cargo_origin', 'cargo_origin_id', \
+                               'from_date_wanted', 'to_date_wanted'
 
     def copy_obj(self, obj_id):
-        copy_obj = self.model.objects.get(pk=obj_id)
+        copy_obj = self.model.objects.get(pk=obj_id).__dict__
+
         for field_name in self.exclude_from_copy_fields:
-            copy_obj.__setattr__(field_name, None)
-        copy_obj.date = timezone.now()
+            if field_name in copy_obj:
+                copy_obj.pop(field_name)
+
+        for key in list(copy_obj.keys()):
+            if key.endswith('_id'):
+                new_key = key[:-3]
+                copy_obj[new_key] = copy_obj.pop(key)
+
         return copy_obj
 
     def get(self, request):
@@ -75,7 +86,8 @@ class OrderCreateView(LoginRequiredMixin, View):
         if copy_id is None:
             form = self.form_class(user=request.user)
         else:
-            form = self.form_class(instance=self.copy_obj(copy_id), user=request.user)
+            form = self.form_class(initial=self.copy_obj(copy_id), user=request.user)
+            # form = self.form_class(instance=self.copy_obj(copy_id), user=request.user)
         formset = self.formset_class()
         return render(request, self.template_name, {'form': form, 'formset': formset})
 
