@@ -175,7 +175,12 @@ class OrderAdmin(admin.ModelAdmin):
     old_state = None
     change_form_template = 'admin/order_change.html'
     tech_fields = '_state', 'id', 'created_at', 'last_update'
-    exclude_from_copy_fields = 'number', 'client_number', 'date', 'status'
+    exclude_from_copy_fields = 'number', 'client_number', 'date', 'status', 'cargo_name', 'cargo_value', \
+                               'cargo_value_currency', 'cargo_value_currency_id', 'cargo_origin', 'cargo_origin_id', \
+                               'from_date_wanted', 'to_date_wanted', 'comment', 'service_marks', \
+                               'from_date_plan', 'from_date_fact', 'to_date_plan', 'to_date_fact', \
+                               'price', 'price_currency', 'insurance_premium', 'insurance_sum_rate', \
+                               'insurance_beneficiary'
     actions = 'download_excel',
     act_on_filtered = 'download_excel',
 
@@ -245,11 +250,11 @@ class OrderAdmin(admin.ModelAdmin):
 
     def copy_object(self, obj):
         obj_dict = obj.__dict__
-        for field in obj._meta.many_to_many:
-            obj_dict[field.name] = list(obj.__getattribute__(field.name).all())
+        m2m_fields = [i.name for i in obj._meta.many_to_many]
 
-        for field in self.tech_fields + self.exclude_from_copy_fields:
-            obj_dict.pop(field)
+        for field in list(self.tech_fields) + list(self.exclude_from_copy_fields) + m2m_fields:
+            if field in obj_dict:
+                obj_dict.pop(field)
 
         for key in list(obj_dict.keys()):
             if key.endswith('_id'):
