@@ -65,7 +65,7 @@ class OrderCreateView(LoginRequiredMixin, View):
     login_url = 'login'
     exclude_from_copy_fields = 'id', 'number', 'date', 'client_number', 'cargo_name', 'cargo_value', \
                                'cargo_value_currency', 'cargo_value_currency_id', 'cargo_origin', 'cargo_origin_id', \
-                               'from_date_wanted', 'to_date_wanted'
+                               'from_date_wanted', 'to_date_wanted', 'comment'
 
     def copy_obj(self, obj_id):
         copy_obj = self.model.objects.get(pk=obj_id).__dict__
