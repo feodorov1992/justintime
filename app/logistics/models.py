@@ -118,7 +118,7 @@ class Order(AbstractModel):
     manager = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL,
                                 verbose_name='Менеджер', related_name='manager_in_orders')
     cargo_name = models.CharField(max_length=255, verbose_name='Наименование груза')
-    cargo_origin = models.ForeignKey(Country, on_delete=models.PROTECT,
+    cargo_origin = models.ForeignKey(Country, on_delete=models.PROTECT, default=Country.get_default_pk,
                                      verbose_name='Страна происхождения груза', related_name='cargo_origin_in_orders')
     cargo_value = models.FloatField(verbose_name='Заявленная стоимость груза')
     cargo_value_currency = models.ForeignKey(Currency, on_delete=models.PROTECT,
@@ -139,8 +139,8 @@ class Order(AbstractModel):
     from_org = models.ForeignKey(Organisation, on_delete=models.PROTECT,
                                  verbose_name='Грузоотправитель', related_name='from_org_in_orders')
     from_contacts = models.TextField(verbose_name='Контакты грузоотправителя')
-    from_index = models.IntegerField(verbose_name='Индекс пункта отправки')
-    from_country = models.ForeignKey(Country, on_delete=models.PROTECT,
+    from_index = models.IntegerField(verbose_name='Индекс пункта отправки', blank=True, null=True)
+    from_country = models.ForeignKey(Country, on_delete=models.PROTECT, default=Country.get_default_pk,
                                      verbose_name='Страна отправки', related_name='from_country_in_orders')
     from_city = models.ForeignKey(City, on_delete=models.PROTECT,
                                   verbose_name='Город отправки', related_name='from_city_in_orders')
@@ -153,8 +153,8 @@ class Order(AbstractModel):
     to_org = models.ForeignKey(Organisation, on_delete=models.PROTECT,
                                verbose_name='Грузополучатель', related_name='to_org_in_orders')
     to_contacts = models.TextField(verbose_name='Контакты грузополучателя')
-    to_index = models.IntegerField(verbose_name='Индекс пункта доставки')
-    to_country = models.ForeignKey(Country, on_delete=models.PROTECT,
+    to_index = models.IntegerField(verbose_name='Индекс пункта доставки', blank=True, null=True)
+    to_country = models.ForeignKey(Country, on_delete=models.PROTECT, default=Country.get_default_pk,
                                    verbose_name='Страна доставки', related_name='to_country_in_orders')
     to_city = models.ForeignKey(City, on_delete=models.PROTECT,
                                 verbose_name='Город доставки', related_name='to_city_in_orders')
