@@ -4,7 +4,6 @@ import uuid
 import xlwt
 from django.db import models
 from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _
 
 
 class XLSGenerator:
@@ -57,8 +56,8 @@ class XLSGenerator:
                 return str(value)
             elif isinstance(value, bool):
                 if value:
-                    return str(_('Yes'))
-                return str(_('No'))
+                    return 'Да'
+                return 'Нет'
             elif isinstance(value, uuid.UUID):
                 return str(value)
             elif value is None:
