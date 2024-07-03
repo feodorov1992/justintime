@@ -127,7 +127,7 @@
             <div class="pseudo_tr one_col multi">
                 <div>
                     <div class="pseudo_td">Индекс</div>
-                    <div class="pseudo_th">{{ order.from_index }}</div>
+                    <div class="pseudo_th">{% if order.from_index %}{{ order.from_index }}{% else %}Не указан{% endif %}</div>
                 </div>
                 <div>
                     <div class="pseudo_td">Страна отправки</div>
@@ -176,7 +176,7 @@
             <div class="pseudo_tr one_col multi">
                 <div>
                     <div class="pseudo_td">Индекс</div>
-                    <div class="pseudo_th">{{ order.to_index }}</div>
+                    <div class="pseudo_th">{% if order.to_index %}{{ order.to_index }}{% else %}Не указан{% endif %}</div>
                 </div>
                 <div>
                     <div class="pseudo_td">Страна доставки</div>

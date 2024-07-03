@@ -1,5 +1,6 @@
 import json
 
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.views.generic import CreateView
@@ -24,7 +25,7 @@ class PopUpMixin:
                 "obj": str(obj),
             }
         )
-        return TemplateResponse(self.request, 'admin/popup_response.html', {'popup_response_data': popup_response_data})
+        return HttpResponse(popup_response_data)
 
 
 class OrgAddView(PopUpMixin, CreateView):

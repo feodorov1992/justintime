@@ -1,5 +1,7 @@
 const $ = django.jQuery;
 const jQuery = django.jQuery;
+let relatedField;
+const isHTML = RegExp.prototype.test.bind(/(<([^>]+)>)/i);
 
 $('#hidden_menu').click(function(event) {
     event.stopPropagation();
@@ -42,10 +44,20 @@ $('#cross').click( function(){
     $('#alert_label').html(null);
 })
 
+function openModal(content) {
+    let container = $('#alert_label')
+    let modalWindow = $('#alert')
+    container.html(null)
+    container.append(content)
+    if (!modalWindow.is(":visible")) {
+        modalWindow.css('display', 'flex')
+    }
+    container.find('.django-select2').djangoSelect2()
+}
+
 function getModalView(url) {
     $.get(url, function (data) {
-        $('#alert_label').html(data)
-        $('#alert').css('display', 'flex')
+        openModal(data)
     })
 }
 
@@ -98,4 +110,35 @@ function removeForm(elem) {
 
 $('body').on('click', '.del_btn', function () {
     removeForm($(this).parents('.cargo_form').last())
+})
+
+$('body').on('click', 'a', function (event) {
+    if ($(this).data('popup') === 'yes') {
+        event.preventDefault()
+        getModalView($(this).attr('href'))
+        relatedField = this.id.slice(7)
+    }
+})
+
+$('body').on('submit', '#alert_label form', function (event) {
+    event.preventDefault();
+    $.post(
+        this.action,
+        $(this).serialize()
+    )
+        .done(function(data){
+            if (isHTML(data)) {
+                openModal(data)
+            } else {
+                data = JSON.parse(data)
+                let select = $(`#id_${relatedField}`)
+                if (select.find(`option[value='${data.value}']`).length) {
+                    select.val(data.value).trigger('change');
+                } else {
+                    let newOption = new Option(data.obj, data.value, true, true);
+                    select.append(newOption).trigger('change');
+                }
+                $('#cross').click()
+            }
+        })
 })
