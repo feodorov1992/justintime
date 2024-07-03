@@ -7,7 +7,7 @@
             <form method="post" action="{{ request.path }}{% if request.META.HTTP_REFERER and request.path != login_url %}?next={{ request.META.HTTP_REFERER }}{% endif %}" enctype="multipart/form-data">
                 {% csrf_token %}
                 <table>
-                    {{ form.as_table }}
+                    {{ form.as_div }}
                 </table>
                 <div class="extra_links">{% block extra_links %}{% endblock %}</div>
                 <div id="form_submit">

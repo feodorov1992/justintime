@@ -109,7 +109,16 @@ a img {
 
 #content {
     flex: 1 0 auto;
+    display: flex;
+/*    flex-direction: column;*/
 }
+
+/*#content>.wrapper {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    justify-content: center;*/
+/*    align-items: center;*/
+/*}*/
 
 .button {
     padding: 10px;
@@ -886,6 +895,7 @@ ul.status_list {
     width: 400px;
 }
 
+.small_form form>div,
 .popup_content form>div {
     width: 100%;
     margin-bottom: 15px;
@@ -893,6 +903,10 @@ ul.status_list {
 
 .popup_content form input {
     width: 100%;
+}
+
+.small_form h2 {
+    margin-top: unset;
 }
 
 .editable_field {
