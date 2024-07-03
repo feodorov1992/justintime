@@ -101,6 +101,11 @@ class OrgEditView(LoginRequiredMixin, ReturnBackMixin, UpdateView):
 class PasswordChangeView(LoginRequiredMixin, ReturnBackMixin, BasePasswordChangeView):
     template_name = 'app_auth/password_change.html'
 
+    def get_form(self, form_class=None):
+        form = super(PasswordChangeView, self).get_form(form_class)
+        form.required_css_class = 'required'
+        return form
+
     def get_success_url(self):
         messages.success(self.request, 'Пароль успешно изменен')
         return self.return_link()

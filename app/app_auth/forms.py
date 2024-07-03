@@ -6,6 +6,7 @@ from orgs.models import Organisation
 
 
 class UserForm(forms.ModelForm):
+    required_css_class = 'required'
 
     class Meta:
         model = User
@@ -16,6 +17,7 @@ class UserForm(forms.ModelForm):
 
 
 class OrgForm(forms.ModelForm):
+    required_css_class = 'required'
 
     class Meta:
         model = Organisation

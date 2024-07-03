@@ -6,9 +6,7 @@
             <h2>{% block page_title %}{% endblock %}</h2>
             <form method="post" action="{{ request.path }}{% if request.META.HTTP_REFERER and request.path != login_url %}?next={{ request.META.HTTP_REFERER }}{% endif %}" enctype="multipart/form-data">
                 {% csrf_token %}
-                <table>
-                    {{ form.as_div }}
-                </table>
+                {{ form.as_div }}
                 <div class="extra_links">{% block extra_links %}{% endblock %}</div>
                 <div id="form_submit">
                     {% url 'login' as login_url %}
