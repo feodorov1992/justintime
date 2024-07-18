@@ -1,0 +1,392 @@
+html {
+    font-family: Arial, sans-serif;
+}
+
+h1,
+.underhead p {
+    text-align: center;
+}
+
+ol {
+    margin: unset;
+}
+
+table.composite_table,
+table.composite_table tr,
+table.composite_table td,
+table.composite_table th,
+table.composite_table tbody,
+table.composite_table thead,
+table.composite_table tfoot {
+    page-break-inside: avoid !important;
+}
+
+b.fat_value {
+    font-size: 1.2em;
+}
+
+b.big_fat_value {
+    font-size: 1.4em;
+}
+
+table, th, td {
+  border: 1px solid gray;
+  border-collapse: collapse;
+}
+
+table.invisible,
+table.invisible th,
+table.invisible td {
+    border: none;
+    text-align: center;
+}
+
+td.underline {
+    border-bottom: 1px solid gray !important
+}
+
+table {
+    width: 100%;
+    margin-top: -1px;
+    font-size: 12px;
+    table-layout: fixed;
+}
+
+.order_blank_individual,
+.order_blank {
+    font-size: 12pt;
+}
+
+.shipping_receipt {
+    font-family: Courier New;
+    font-size: 12pt
+}
+
+tr.hide_bottom,
+tr.hide_bottom td,
+tr.hide_bottom th {
+    border-bottom: none;
+}
+
+tr.hide_top,
+tr.hide_top td,
+tr.hide_top th {
+    border-top: none;
+}
+
+table.shipping_receipt tr>td:nth-child(1),
+table.order_blank tr>td:nth-child(1) {
+    width: 30px;
+    font-weight: bold;
+}
+
+table.shipping_receipt tr>td:nth-child(2),
+table.order_blank tr>td:nth-child(2) {
+    width: 200px;
+    font-weight: bold;
+}
+
+th, td {
+    vertical-align: top;
+    padding: 3px;
+    height: 15px;
+}
+
+td.center {
+    text-align: center;
+}
+
+.align_center {
+    vertical-align: center;
+    display: inline-block;
+    border: 0;
+}
+
+td.align_center_simple {
+    vertical-align: middle;
+}
+
+.align_center>* {
+    float: left;
+    margin-right: 5px
+}
+
+.text_right>* {
+    width: 60%;
+    float: right;
+    text-align: right;
+    margin: 0;
+    padding: 0;
+}
+
+.legal_head {
+    display: inline-block;
+    width: 100%;
+}
+
+.legal_head p {
+    max-width: 40%;
+    display: block;
+    float: right;
+    text-align: right;
+}
+
+.tiny {
+    font-size: 9px;
+}
+
+.square {
+    border: 1px solid black;
+    padding: 3px;
+}
+
+.placeholder {
+    height: 14px;
+    width: 14px;
+}
+
+.underscore {
+    display: inline-block;
+    width: 300px;
+    border-bottom: 1px solid black;
+    text-align: end;
+}
+
+.sign_space {
+    display: inline-block;
+    width: 18em;
+    height: 5em;
+    border-bottom: 1px solid gray;
+    padding-bottom: 2px;
+}
+
+.sign_space.small {
+    height: auto !important;
+    width: 45%;
+}
+
+.sign_space img {
+    height: 100%;
+    margin-left: 20%;
+}
+
+.very_small_text {
+    font-size: 7pt;
+    page-break-inside: avoid !important;
+}
+
+table.super_big_table {
+    table-layout: auto !important;
+    page-break-inside:auto;
+    border: none;
+}
+
+table.super_big_table thead {
+    display: table-header-group !important;
+}
+
+table.super_big_table div {
+    display: block;
+    page-break-inside: avoid !important;
+}
+
+table.super_big_table tr {
+    page-break-before: always;
+    page-break-after: always;
+    page-break-inside: avoid !important;
+}
+
+table.super_big_table tr:nth-last-child(3) {
+    page-break-before: auto !important;
+}
+
+table.super_big_table>thead>tr>th,
+table.super_big_table>tbody>tr>th,
+table.super_big_table>tbody>tr>td {
+    font-size: 6pt;
+    text-align: center;
+    vertical-align: middle;
+}
+
+table.super_big_table th {
+    white-space: nowrap
+}
+
+.act {
+    width: 100%;
+}
+
+.act h1 {
+    text-align: left;
+    border-bottom: 2px solid black;
+    padding: 2px;
+}
+
+.act table {
+    table-layout: auto !important;
+}
+
+table.requisites,
+table.requisites th,
+table.requisites td {
+    border: none;
+    text-align: left;
+    padding: 10px 0;
+    font-size: 14pt;
+}
+
+table.requisites td {
+    vertical-align: middle;
+    padding-right: 10px;
+}
+
+table.services {
+    border: 2px solid black;
+    margin-top: 15px
+}
+
+table.services th {
+    font-size: 12pt;
+    padding: 10px;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+table.services td {
+    font-size: 12pt;
+}
+
+table.align-right {
+    width: auto;
+    text-align: right;
+    font-size: 12pt;
+    margin-top: 10px;
+}
+
+table.align-right,
+table.align-right th,
+table.align-right td {
+    border: none;
+    padding-left: 15px;
+}
+
+table.signatures {
+    font-size: 12pt;
+    margin-top: 10px;
+    table-layout: fixed;
+}
+
+table.signatures,
+table.signatures th,
+table.signatures td{
+    border: none;
+}
+
+table.bill_requisites {
+    font-size: 13pt;
+}
+
+table.bill_requisites .no_border {
+    border: none;
+}
+
+.new_page {
+    page-break-before: always;
+}
+
+.cmr,
+.cmr tr,
+.cmr th,
+.cmr td {
+    border: none;
+}
+
+.cmr tr {
+    border-bottom: 1px dotted gray;
+}
+
+.cmr td {
+    height: 16pt;
+}
+
+.fat_red_top {
+    border-top: 3px solid red !important;
+}
+
+.fat_red_bottom {
+    border-bottom: 3px solid red !important;
+}
+
+.fat_red_left {
+    border-left: 3px solid red !important;
+}
+
+.fat_red_right {
+    border-right: 3px solid red !important;
+}
+
+.thin_red_top {
+    border-top: 1px solid red !important;
+}
+
+.thin_red_bottom {
+    border-bottom: 1px solid red !important;
+}
+
+.thin_red_left {
+    border-left: 1px solid red !important;
+}
+
+.thin_red_right {
+    border-right: 1px solid red !important;
+}
+
+.cmr_head {
+    color: red;
+}
+
+.cmr_head>div {
+    height: 100%;
+    float: left;
+    margin-right: 10px;
+}
+
+.cmr_head__number {
+    font-weight: bold;
+    font-size: 12pt;
+}
+
+.cmr_head__help_text {
+    font-size: 6pt;
+    white-space: nowrap;
+}
+
+.cmr_head__help_text p {
+    margin: 0;
+    padding: 0;
+}
+
+.cmr_head_content {
+    width: 100%;
+    display: -webkit-box;
+    -webkit-box-pack: justify;
+    font-size: 8pt;
+}
+
+.cmr_head_content>div {
+    max-width: 35%;
+}
+
+.cmr_logo {
+    height: 60px;
+    width: 90px;
+    display: -webkit-box;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+    align-items: center;
+    font-weight: bold;
+    color: red;
+    font-size: 20pt;
+    background-size: 100% auto;
+    background-repeat: no-repeat;
+}

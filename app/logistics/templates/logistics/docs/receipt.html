@@ -1,0 +1,94 @@
+{% extends 'core/docs/base.html' %}
+{% load pdf_static %}
+{% block content %}
+<table class="invisible">
+    <tr>
+        <td><img src="{% static 'img/logo_blue.png' %}" height="150px" alt="Logo"></td>
+        <td><p class="shipping_receipt">Приложение к Договору <br>№ {{ order.contract.number }} от {{ order.contract.date|date:"d.m.Y" }}</p></td>
+    </tr>
+</table>
+<br><br><br><br>
+<div>
+    <h3 style="text-align: center" class="shipping_receipt">ЭКСПЕДИТОРСКАЯ РАСПИСКА</h3>
+</div>
+<div class="composite_table">
+    <table class="invisible">
+        <tr class="shipping_receipt">
+            <td class="underline">{{ order.from_date_fact|date:"d.m.Y" }} г.</td>
+            <td></td>
+            <td class="underline">{{ order.number }}</td>
+        </tr>
+        <tr class="shipping_receipt">
+            <td class="tiny">1 (дата)</td>
+            <td></td>
+            <td class="tiny">2 (номер)</td>
+        </tr>
+    </table>
+    <br><br>
+    <ol start="3" class="shipping_receipt">
+        <li>Грузоотправитель
+            <b>{{ order.from_org.legal_name }}, ИНН {{ order.from_org.inn }}, {{ order.from_org.legal_address }}</b>
+        </li>
+        <li>Клиент
+            <b>{{ order.client.legal_name }}{% if order.client.inn %}, ИНН {{ order.client.inn }}{% endif %}, {{ order.client.legal_address }}</b>
+        </li>
+        <li>Экспедитор
+            <b>{{ expeditor.legal_name }}, {{ expeditor.legal_address }}</b>
+        </li>
+        <li>Страна происхождения груза
+            <b>{{ order.cargo_origin }}</b>
+        </li>
+        <li>Товарный код, маркировка груза
+            <b>В соответствии с товаросопроводительными документами</b>
+        </li>
+        <li>Количество мест
+            <b>{{ order.sum_quantity }}</b> ед., вид упаковки
+            <b>{{ packages }}</b>
+        </li>
+        <li>Вес брутто
+            <b>{{ order.sum_weight|floatformat:-2 }}</b> кг
+        </li>
+        <li>
+            Объем
+            <b>{{ order.sum_volume|floatformat:-2 }}</b> м&sup3;
+        </li>
+        <li>
+            Стоимость
+            <b>{% if order.cargo_value %}{{ order.cargo_value|floatformat:-2 }} {{ order.cargo_value_currency.displayed_name }}{% else %}Не указана{% endif %}</b>
+        </li>
+        <li>
+            Размер упаковки
+            <b>В соответствии с упаковочными листами</b>
+        </li>
+        <li>
+            Условия
+            <b>
+                Организация перевозки груза
+                на основании поручения № {% if order.client_number %}{{ order.client_number }}{% else %}{{ order.number }}{% endif %}<br>
+                по маршруту:
+                {{ order.from_org.legal_name }},
+                {% if order.from_org.inn %}ИНН {{ order.from_org.inn }},{% endif %}
+                {{ order.from_address_full }}
+                -
+                {{ order.to_org.legal_name }},
+                {% if order.to_org.inn %}ИНН {{ order.to_org.inn }},{% endif %}
+                {{ order.to_address_full }}
+            </b>
+        </li>
+        <li>
+            Особые отметки<br>
+            {% if order.gov_contract_number %}<br><b>№ ИГК:</b> {{ order.gov_contract_number }}<br>{% endif %}
+            Особые свойства груза: <b>{% if cargo_params %}{{ cargo_params }}{% else %}отсутствуют{% endif %}</b><br>
+            <u class="shipping_receipt">В случае авиаперевозки вес указан до взвешивания в аэропорту отправления.</u>
+            <br><br><br><br><br><br>
+        </li>
+        <li>
+            Подпись экспедитора
+        </li>
+    </ol>
+    <br><br>
+    <div class="shipping_receipt">
+        <span class="sign_space"></span>/<span class="sign_space"></span>
+    </div>
+</div>
+{% endblock %}

@@ -12,3 +12,4 @@ django-admin-autocomplete-all
 django-admin-autocomplete-filter
 django-admin-rangefilter
 django-select2
+pdfkit

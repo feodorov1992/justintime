@@ -1,5 +1,8 @@
 {% extends 'admin/change_form.html' %}
 {% block object-tools %}
-    {% if adminform.form.instance.pk %}<a href="{% url 'admin:logistics_order_add' %}?copy_order={{ adminform.form.instance.pk }}">Копировать заявку</a>{% endif %}
+    {% with adminform.form.instance as order %}
+        {% if order.pk %}<a href="{% url 'admin:logistics_order_add' %}?copy_order={{ order.pk }}">Копировать заявку</a>{% endif %}
+        {% if order.pk and order.from_date_fact %}<a href="{% url 'receipt' pk=order.pk filename='ЭР_'|add:order.number|add:'.pdf' %}" target="_blank">Скачать ЭР</a>{% endif %}
+    {% endwith %}
     {{ block.super }}
 {% endblock %}

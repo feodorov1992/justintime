@@ -1,3 +1,4 @@
+import io
 import logging
 from typing import Type
 
@@ -16,11 +17,13 @@ from django_filters import FilterSet
 from django_filters.views import FilterView
 from django_genericfilters.views import FilteredListView
 
-from cats.models import Currency
+from cats.models import Currency, CargoParam
+from core.pdf_generator import PDFGenerator
 from geo.models import Country
 from logistics.filtersets import OrderFilterSet, QuickOrderFilterSet
 from logistics.forms import OrderForm, CargoFormset, QuickOrderForm, QuickDocFormset
 from logistics.models import Order, AttachedDocument, QuickOrder
+from orgs.models import Organisation
 
 logger = logging.getLogger(__name__)
 
@@ -250,3 +253,27 @@ class QuickOrderCreateView(LoginRequiredMixin, View):
 
 class QuickOrderListView(OrderListView):
     filterset_class = QuickOrderFilterSet
+
+
+class ReceiptView(View):
+
+    @staticmethod
+    def get_context(obj):
+        packages = obj.cargos.select_related('package') \
+            .order_by('package__name').values_list('package__name', flat=True).distinct()
+        packages = ', '.join(packages).capitalize()
+        cargo_params = CargoParam.objects.filter(cargo__in=obj.cargos.all()) \
+            .order_by('name').values_list('name', flat=True).distinct()
+        cargo_params = ', '.join(cargo_params).capitalize()
+        expeditor = Organisation.objects.get(is_expeditor=True)
+        return {
+            'order': obj,
+            'packages': packages,
+            'cargo_params': cargo_params,
+            'expeditor': expeditor
+        }
+
+    def get(self, request, pk, filename):
+        order = Order.objects.get(pk=pk)
+        generator = PDFGenerator(filename)
+        return generator.response('logistics/docs/receipt.html', self.get_context(order))
