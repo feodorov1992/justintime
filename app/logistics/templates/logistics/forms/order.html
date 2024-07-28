@@ -94,7 +94,7 @@
                         {% if fields.from_date_wanted.errors %}{{ fields.from_date_wanted.errors }}{% else %}&nbsp;{% endif %}
                     </div>
                 </div>
-                <div class="lth">
+                <div class="lth contacts">
                     <div class="form-field contacts">
                         {{ fields.from_contacts.label_tag }}
                         {{ fields.from_contacts }}
@@ -102,7 +102,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-row">
+            <div class="form-row address">
                 <div>
                     <div class="form-field">
                         {{ fields.from_index.label_tag }}
@@ -126,7 +126,7 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-field">
+                <div class="form-field mth">
                     {{ fields.from_address.label_tag }}
                     {{ fields.from_address }}
                     {% if fields.from_address.errors %}{{ fields.from_address.errors }}{% else %}&nbsp;{% endif %}
@@ -157,7 +157,7 @@
                         {% if fields.to_date_wanted.errors %}{{ fields.to_date_wanted.errors }}{% else %}&nbsp;{% endif %}
                     </div>
                 </div>
-                <div class="lth">
+                <div class="lth contacts">
                     <div class="form-field contacts">
                         {{ fields.to_contacts.label_tag }}
                         {{ fields.to_contacts }}
@@ -165,7 +165,7 @@
                     </div>
                 </div>
             </div>
-            <div class="form-row">
+            <div class="form-row address">
                 <div>
                     <div class="form-field">
                         {{ fields.to_index.label_tag }}
@@ -189,7 +189,7 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-field">
+                <div class="form-field mth">
                     {{ fields.to_address.label_tag }}
                     {{ fields.to_address }}
                     {% if fields.to_address.errors %}{{ fields.to_address.errors }}{% else %}&nbsp;{% endif %}
