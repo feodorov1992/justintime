@@ -348,6 +348,10 @@ class Order(AbstractModel):
                     self.__setattr__(key, new_value)
                 else:
                     self.__getattribute__(key).set(new_value)
+                    changes[key] = {
+                        'old': [str(i) for i in changes[key]['old']],
+                        'new': [str(i) for i in changes[key]['new']]
+                    }
                 updated = True
         if self.insurance_needed and not self.insurance_beneficiary:
             self.insurance_beneficiary = self.client

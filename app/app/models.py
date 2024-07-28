@@ -183,7 +183,12 @@ class AbstractModel(models.Model):
 
         field = self._meta.get_field(key)
         if field.is_relation:
+            if isinstance(value, list):
+                return ', '.join(value)
             return str(field.related_model.objects.get(pk=value))
+
+        if field.choices:
+            return dict(field.choices).get(value, value)
 
         if isinstance(value, float) or isinstance(value, int):
             return floatformat(value, -2)
@@ -197,6 +202,7 @@ class AbstractModel(models.Model):
 
     def humanize_changes(self, changes_dict, flat=False):
         verbose_names = {field.name: field.verbose_name for field in self._meta.fields}
+        verbose_names.update({field.name: field.verbose_name for field in self._meta.local_many_to_many})
         result = [
             {
                 'verbose': verbose_names.get(key, key),
