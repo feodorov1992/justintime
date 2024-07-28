@@ -1044,7 +1044,8 @@ a.doc_download:hover {
     }
 
     .ol-row>*:first-child {
-        width: 50%;
+        width: auto;
+        min-width: 50%;
     }
 
     .ol-row>p.center {
