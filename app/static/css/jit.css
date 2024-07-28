@@ -1062,7 +1062,8 @@ a.doc_download:hover {
 
     .ol-row.narrow>*:first-child {
         width: auto;
-        margin-right: 10px
+        min-width: unset;
+        margin-right: 15px
     }
 
     .form-row {
