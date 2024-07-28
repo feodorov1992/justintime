@@ -51,29 +51,29 @@
             {% for obj in page_obj %}
                 <div class="orders-list-item">
                     <div class="orders-list-item-content">
-                        <div class="ol-col">
-                            <p>
+                        <div class="ol-row">
+                            <p class="left">
                                 <span>Номер заявки</span>
                                 <span class="field_value">{{ obj.number }}</span>
                             </p>
-                            <p>
-                                {% if obj.client_number %}
-                                <span>Клиентский номер</span>
-                                <span class="field_value">{{ obj.client_number }}</span>
-                                {% else %}
-                                &nbsp;
-                                {% endif %}
-                            </p>
-                        </div>
-                        <div class="ol-col">
-                            <p>
+                            <p class="center">
                                 <span>Дата заявки</span>
                                 <span class="field_value">{{ obj.created_at|date:"SHORT_DATE_FORMAT" }}</span>
+                            </p>
+                            <p class="right">
                                 <span>Статус</span>
                                 <span class="quick_order_status{% if not obj.processed %} unprocessed{% endif %}">{% if obj.processed %}Обработана{% else %}Не обработана{% endif %}</span>
                             </p>
+                        </div>
+                        {% if obj.client_number %}
+                        <div class="ol-row">
+                            <p>
+                                <span>Клиентский номер</span>
+                                <span class="field_value">{{ obj.client_number }}</span>
+                            </p>
                             <p>&nbsp;</p>
                         </div>
+                        {% endif %}
                     </div>
                     <div class="orders-list-item-links">
                         {% if obj.processed %}

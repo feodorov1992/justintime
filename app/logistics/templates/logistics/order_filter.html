@@ -76,11 +76,22 @@
             {% for obj in page_obj %}
                 <div class="orders-list-item">
                     <div class="orders-list-item-content">
-                        <div class="ol-col">
-                            <p>
+                        <div class="ol-row">
+                            <p class="left">
                                 <span>Номер заявки</span>
                                 <span class="field_value">{{ obj.number }}</span>
                             </p>
+                            <p class="center">
+                                <span>Дата заявки</span>
+                                <span class="field_value">{{ obj.date|date:"SHORT_DATE_FORMAT" }}</span>
+                            </p>
+                            <p class="right">
+                                <span>Статус</span>
+                                <span onclick="getModalView('{% url 'order_status' pk=obj.pk %}')" class="order_status {{ obj.status }}">{{ obj.get_status_display }}</span>
+                            </p>
+                        </div>
+                        {% if obj.client_number or obj.price %}
+                        <div class="ol-row">
                             <p>
                                 {% if obj.client_number %}
                                 <span>Клиентский номер</span>
@@ -88,21 +99,6 @@
                                 {% else %}
                                 &nbsp;
                                 {% endif %}
-                            </p>
-                            <p>&nbsp;</p>
-                            <p>
-                                <span>Пункт отправки</span>
-                            </p>
-                            <p>
-                                <span class="field_value">{{ obj.from_address_short }}</span>
-                            </p>
-                        </div>
-                        <div class="ol-col">
-                            <p>
-                                <span>Дата заявки</span>
-                                <span class="field_value">{{ obj.date|date:"SHORT_DATE_FORMAT" }}</span>
-                                <span>Статус</span>
-                                <span onclick="getModalView('{% url 'order_status' pk=obj.pk %}')" class="order_status {{ obj.status }}">{{ obj.get_status_display }}</span>
                             </p>
                             <p>
                                 {% if obj.price %}
@@ -112,13 +108,29 @@
                                     &nbsp;
                                 {% endif %}
                             </p>
+                        </div>
+                        {% endif %}
+                        <div class="ol-row">
                             <p>&nbsp;</p>
-                            <p>
-                                <span>Пункт доставки</span>
-                            </p>
-                            <p>
-                                <span class="field_value">{{ obj.to_address_short }}</span>
-                            </p>
+                            <p>&nbsp;</p>
+                        </div>
+                        <div class="ol-row narrow">
+                            <div class="wrap-group">
+                                <p>
+                                    <span>Пункт отправки</span>
+                                </p>
+                                <p>
+                                    <span class="field_value">{{ obj.from_address_short }}</span>
+                                </p>
+                            </div>
+                            <div class="wrap-group">
+                                <p>
+                                    <span>Пункт доставки</span>
+                                </p>
+                                <p>
+                                    <span class="field_value">{{ obj.to_address_short }}</span>
+                                </p>
+                            </div>
                         </div>
                     </div>
                     <div class="orders-list-item-links">

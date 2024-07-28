@@ -1,4 +1,4 @@
-Django
+Django<5
 psycopg2
 uWSGI
 Pillow
@@ -13,3 +13,4 @@ django-admin-autocomplete-filter
 django-admin-rangefilter
 django-select2
 pdfkit
+pypdf2
