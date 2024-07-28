@@ -150,7 +150,8 @@ a img {
 
 a.button {
     text-decoration: none;
-    display: block;
+    display: inline-block;
+    padding: 10px 25px;
     text-align: center;
 }
 
@@ -439,6 +440,20 @@ a.filter-clear:hover {
     width: 100%;
     justify-content: space-between;
     align-items: center;
+}
+
+.headline-group {
+    display: flex;
+    align-items: center;
+}
+
+.headline>div {
+    white-space:nowrap;
+}
+
+.headline-group h1 {
+    margin-right: 25px;
+    font-size: 24px;
 }
 
 .order_number {
@@ -1077,4 +1092,69 @@ a.doc_download:hover {
         width: 45% !important;
     }
 
+    .headline {
+        align-items: flex-start;
+        /*margin-bottom: 15px;*/
+    }
+
+    .headline-group {
+        flex-wrap: wrap;
+    }
+
+    .headline-group h1 {
+        margin-block-start: 0;
+        margin-block-end: 0.33em;
+        font-size: 20px;
+    }
+
+    .headline .headline-group:last-child {
+        justify-content: flex-end;
+    }
+
+    .headline .headline-group:last-child>* {
+        margin-bottom: 0.33em
+    }
+
+    .table_list.light_blue>.pseudo_table {
+        width: calc(30% - 20px);
+    }
+
+    .table_list.light_blue>.pseudo_table:first-child {
+        width: calc(70% - 20px);
+    }
+
+    .pseudo_tr.multi {
+        flex-wrap: wrap;
+    }
+
+    .pseudo_tr.multi>*:first-child {
+        width: 70% !important;
+    }
+
+    .mob-reverse {
+        flex-direction: column-reverse;
+    }
+
+    .mob-reverse .pseudo_table {
+        width: 100%;
+    }
+
+    .cargo-params {
+        display: flex;
+    }
+
+    .cargo-params .pseudo_tr {
+        display: flex;
+        white-space: nowrap;
+        margin-right: 10px;
+    }
+
+    .cargo-params .pseudo_tr>* {
+        width: auto !important;
+        margin-right: 10px;
+    }
+
+    .wide-only {
+        display: none;
+    }
 }

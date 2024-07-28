@@ -4,13 +4,17 @@
     {% url 'orders_list' as orders_list_url %}
     <div class="back_url"><a href="{% if request.META.HTTP_REFERER and orders_list_url in request.META.HTTP_REFERER %}{{request.META.HTTP_REFERER|escape}}{% else %}{{ orders_list_url }}{% endif %}"><img src="{% static 'img/lq.svg' %}" alt="">Вернуться в ленту заявок</a></div>
     <div class="headline">
-        <h1>Информация по заявке № <span class="order_number">{{ order.number }}</span></h1>
-        <div>Дата создания заявки: <span class="field_value">{{ order.date|date:"SHORT_DATE_FORMAT" }}</span></div>
-        <div>Статус: <span onclick="getModalView('{% url 'order_status' pk=order.pk %}')" class="order_status {{ order.status }}">{{ order.get_status_display }}</span></div>
-        <div class="buttons">
-            {% if order.tracking_url %}<a class="button" href="{{ order.tracking_url }}" target="_blank">Отследить</a>{% endif %}
-            <a class="button" href="{% url 'order_update' pk=order.pk %}">Изменить</a>
-            <a class="button" href="{% url 'order_create' %}?copy={{ order.pk }}">Скопировать</a>
+        <div class="headline-group">
+            <h1>Информация по заявке № <span class="order_number">{{ order.number }}</span></h1>
+            <div>Дата создания заявки: <span class="field_value">{{ order.date|date:"SHORT_DATE_FORMAT" }}</span></div>
+        </div>
+        <div class="headline-group">
+            <div>Статус: <span onclick="getModalView('{% url 'order_status' pk=order.pk %}')" class="order_status {{ order.status }}">{{ order.get_status_display }}</span></div>
+            <div class="buttons">
+                {% if order.tracking_url %}<a class="button" href="{{ order.tracking_url }}" target="_blank">Отследить</a>{% endif %}
+                <a class="button" href="{% url 'order_update' pk=order.pk %}">Изменить</a>
+                <a class="button" href="{% url 'order_create' %}?copy={{ order.pk }}">Скопировать</a>
+            </div>
         </div>
     </div>
     <div class="table_list light_blue">
@@ -198,20 +202,22 @@
             </div>
         </div>
     </div>
-    <div class="table_list">
+    <div class="table_list mob-reverse">
         <div class="pseudo_table">
             <h3>Суммарные характеристики грузов</h3>
-            <div class="pseudo_tr">
-                <div class="pseudo_td">Вес брутто</div>
-                <div class="pseudo_th">{{ order.sum_weight|floatformat:-3 }} кг</div>
-            </div>
-            <div class="pseudo_tr">
-                <div class="pseudo_td">Объем</div>
-                <div class="pseudo_th">{{ order.sum_volume|floatformat:-3 }} м&sup3;</div>
-            </div>
-            <div class="pseudo_tr">
-                <div class="pseudo_td">Количество мест</div>
-                <div class="pseudo_th">{{ order.sum_quantity|floatformat }}</div>
+            <div class="cargo-params">
+                <div class="pseudo_tr">
+                    <div class="pseudo_td">Вес брутто</div>
+                    <div class="pseudo_th">{{ order.sum_weight|floatformat:-3 }} кг</div>
+                </div>
+                <div class="pseudo_tr">
+                    <div class="pseudo_td">Объем</div>
+                    <div class="pseudo_th">{{ order.sum_volume|floatformat:-3 }} м&sup3;</div>
+                </div>
+                <div class="pseudo_tr">
+                    <div class="pseudo_td">Количество мест</div>
+                    <div class="pseudo_th">{{ order.sum_quantity|floatformat }}</div>
+                </div>
             </div>
         </div>
         <div class="pseudo_table">
@@ -234,7 +240,7 @@
             </div>
         </div>
     </div>
-    <div>
+    <div class="wide-only">
         <h3 class="open_mark" data-target_id="#cargo_table">Детализация по грузам <img src="{% static 'img/down_quote.svg' %}" alt=""></h3>
         <table id="cargo_table">
             <thead>
