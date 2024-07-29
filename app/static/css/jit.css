@@ -1167,6 +1167,17 @@ a.doc_download:hover {
 
 @media screen and (max-width: 800px) {
 
+    #alert_label {
+        min-width: unset;
+        width: calc(100% - 20px);
+        padding: 10px;
+    }
+
+    #alert>div {
+        max-width: calc(100% - 35px);
+        margin-right: 15px;
+    }
+
     .wrapper {
         width: 95%;
     }
@@ -1328,6 +1339,11 @@ a.doc_download:hover {
         color: white;
         text-decoration: none;
         font-weight: 400;
+    }
+
+    .small_form>div {
+        min-width: 85vw;
+        width: 95%
     }
 
 }
