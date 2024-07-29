@@ -1182,6 +1182,15 @@ a.doc_download:hover {
         margin-right: 15px;
     }
 
+    header {
+        height: 70px;
+    }
+
+    header a img {
+        width: 70%;
+        height: 70%;
+    }
+
     .wrapper {
         width: 95%;
     }

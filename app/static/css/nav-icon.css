@@ -1,7 +1,7 @@
 #nav-icon {
     display: none;
-    width: 60px;
-    height: 45px;
+    width: 40px;
+    height: 30px;
     margin: 5px;
     position: relative;
     -webkit-transform: rotate(0deg);
@@ -18,7 +18,7 @@
 #nav-icon span {
     display: block;
     position: absolute;
-    height: 9px;
+    height: 6px;
     width: 100%;
     background: white;
     opacity: 1;
@@ -42,7 +42,7 @@
 }
 
 #nav-icon span:nth-child(2) {
-    top: 18px;
+    top: 12px;
     -webkit-transform-origin: left center;
     -moz-transform-origin: left center;
     -o-transform-origin: left center;
@@ -50,7 +50,7 @@
 }
 
 #nav-icon span:nth-child(3) {
-    top: 36px;
+    top: 24px;
     -webkit-transform-origin: left center;
     -moz-transform-origin: left center;
     -o-transform-origin: left center;
@@ -62,8 +62,8 @@
     -moz-transform: rotate(45deg);
     -o-transform: rotate(45deg);
     transform: rotate(45deg);
-    top: -3px;
-    left: 8px;
+    top: -1px;
+    left: 5px;
 }
 
 #nav-icon.open span:nth-child(2) {
@@ -76,6 +76,6 @@
     -moz-transform: rotate(-45deg);
     -o-transform: rotate(-45deg);
     transform: rotate(-45deg);
-    top: 39px;
-    left: 8px;
+    top: 28px;
+    left: 5px;
 }
