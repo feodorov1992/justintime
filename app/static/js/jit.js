@@ -31,7 +31,7 @@ $( "#profile_img" ).click(function(event) {
 });
 
 $(window).click(function() {
-    if ($('#hidden_menu').is(":visible")) {
+    if ($('#hidden_menu').is(":visible") && !$('#nav-icon').is(":visible")) {
         $( "#profile_img" ).click()
     }
     if ($('#alert').is(":visible")) {
@@ -141,4 +141,28 @@ $('body').on('submit', '#alert_label form', function (event) {
                 $('#cross').click()
             }
         })
+})
+
+$('#nav-icon').click(function(){
+    $(this).toggleClass('open');
+    let menu = $('.menu')
+    if (menu.is(':visible')) {
+        menu.hide();
+    } else {
+        menu.show();
+    }
+});
+
+$('#show-filters').click(function () {
+    let filter = $('.filter-form')
+    if (!filter.is(':visible')) {
+        filter.show()
+    }
+})
+
+$('#filter-cross').click(function () {
+    let filter = $('.filter-form')
+    if (filter.is(':visible')) {
+        filter.hide()
+    }
 })

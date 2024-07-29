@@ -2,6 +2,10 @@
 {% block title %}Лента заявок{% endblock %}
 {% block content %}
     <div class="submenu">
+        <div class="filter-buttons mobile">
+            <span id="show-filters">Фильтры</span>
+            <a class="filter-clear" href="{{ request.path }}">Очистить фильтры</a>
+        </div>
         <div class="links">
             <a class="selected" href="">Лента заявок</a>
             <a href="{% url 'quick_orders_list' %}">Лента быстрых заявок</a>
@@ -11,9 +15,15 @@
             <a href="{% url 'quick_order_create' %}" class="button big_button">Быстрая заявка</a>
         </div>
     </div>
+
     <div class="ol-content">
         <div class="filter-form">
-            <h2>Фильтры</h2>
+            <div class="filter-title-row">
+                <h2>Фильтры</h2>
+                <div id="filter-cross">{% load static %}
+                    <img src="{% static 'img/cross.svg' %}" alt="">
+                </div>
+            </div>
             <form method="get">
                 {% if filter.form.client %}
                 <div class="filter-row">
