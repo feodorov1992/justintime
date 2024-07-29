@@ -1297,8 +1297,7 @@ a.doc_download:hover {
         z-index: 1000;
         top: 10px;
         left: 10px;
-        height: auto;
-        max-height: calc(100vh - 40px);
+        max-height: calc(100% - 80px);
         overflow: scroll;
         width: calc(100% - 40px);
         background: white;
