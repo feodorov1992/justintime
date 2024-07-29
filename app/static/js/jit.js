@@ -157,6 +157,7 @@ $('#show-filters').click(function () {
     let filter = $('.filter-form')
     if (!filter.is(':visible')) {
         filter.show()
+        $('html').css('overflow', 'hidden');
     }
 })
 
@@ -165,4 +166,5 @@ $('#filter-cross').click(function () {
     if (filter.is(':visible')) {
         filter.hide()
     }
+    $('html').removeAttr('style')
 })
