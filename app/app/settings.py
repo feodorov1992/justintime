@@ -33,7 +33,7 @@ ALLOWED_HOSTS = [DOMAIN, f'www.{DOMAIN}']
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
+    'app.apps.JustInTimeAdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
