@@ -11,7 +11,6 @@
         <div class="headline-group">
             <div>Статус: <span onclick="getModalView('{% url 'order_status' pk=order.pk %}')" class="order_status {{ order.status }}">{{ order.get_status_display }}</span></div>
             <div class="buttons">
-                {% if order.tracking_url %}<a class="button" href="{{ order.tracking_url }}" target="_blank">Отследить</a>{% endif %}
                 <a class="button" href="{% url 'order_update' pk=order.pk %}">Изменить</a>
                 <a class="button" href="{% url 'order_create' %}?copy={{ order.pk }}">Скопировать</a>
             </div>
@@ -58,7 +57,7 @@
             <div class="pseudo_tr">
                 <div class="pseudo_td">Заявленная стоимость груза</div>
                 <div class="pseudo_th">{{ order.cargo_value|floatformat:-2 }} {{ order.cargo_value_currency.displayed_name }}</div>
-                <div class="pseudo_td"><img src="{% if order.insurance_needed %}{% static 'img/text_checkmark.svg' %}{% else %}{% static 'img/text_cross.svg' %}{% endif %}" alt=""> Страхование требуется</div>
+                <div class="pseudo_td"><img src="{% if order.insurance_needed %}{% static 'img/text_checkmark.svg' %}{% else %}{% static 'img/text_cross.svg' %}{% endif %}" alt=""> Страхование {% if not order.insurance_needed %}не {% endif %}требуется</div>
             </div>
             {% if order.insurance_needed %}
             <div class="pseudo_tr">
