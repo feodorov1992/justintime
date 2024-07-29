@@ -48,7 +48,10 @@ class PackageWidget(MySelect2Widget):
 
 class OrderForm(ModelForm):
     required_css_class = 'required'
-    
+
+    from_index = forms.CharField(label='Индекс', widget=forms.NumberInput)
+    to_index = forms.CharField(label='Индекс', widget=forms.NumberInput)
+
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user')
         super(OrderForm, self).__init__(*args, **kwargs)

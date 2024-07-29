@@ -1355,4 +1355,65 @@ a.doc_download:hover {
         font-size: 14px;
     }
 
+    .form-2cols {
+        flex-direction: column;
+    }
+
+    .form-col {
+        width: 100%;
+    }
+
+    .mth {
+        width: 100%;
+    }
+
+    .address>* {
+        width: 30%;
+    }
+
+    .address .lth {
+        width: 60% !important;
+    }
+
+    .lth.contacts {
+        width: 100% !important;
+    }
+
+    .cargo_form {
+        flex-direction: column;
+        width: calc(100% - 30px);
+        padding: 15px;
+        background: #F0F0F0;
+        border-radius: 8px;
+    }
+
+    .cargo_form>.gray_plate {
+        width: 100%;
+        padding: 0;
+        background-color: transparent;
+    }
+
+    .cargo_form .form-row:first-child>div {
+        width: 100% !important;
+    }
+
+    .cargo_form .del_btn {
+        padding: 10px 0;
+        width: 100%;
+        height: auto !important;
+        margin-left: 0
+    }
+
+    .cargo-size {
+        margin-bottom: 15px;
+    }
+
+    #content h1 {
+        font-size: 20px;
+    }
+
+    #content h3 {
+        font-size: 16px;
+    }
+
 }
