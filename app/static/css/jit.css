@@ -1294,7 +1294,8 @@ a.doc_download:hover {
     .filter-form {
         display: none;
         position: fixed;
-        top: 110px;
+        z-index: 1000;
+        top: 80px;
         left: 10px;
         width: calc(100% - 40px);
         background: white;
